@@ -1,0 +1,41 @@
+# This file will create a task and also execute it using TaskRun CRD.
+
+# A task to run hello world! and Goodbye.
+apiVersion: tekton.dev/v1beta1
+kind: Task                            # A multi step(container) task(pod) will be created.
+metadata:
+  name: helloworld-goodbye
+spec:
+  steps:                              # Separate container for each step inside this task (pod) will be created because each step in a task (pod) is a container.
+    - name: helloworld
+      image: alpine
+      script: |
+        #!/bin/sh
+        echo "helloworld!"
+
+    - name: goodbye
+      image: alpine
+      script: |
+        #!/bin/sh
+        echo "goodbye!"
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun                         # A CRD to execute/invoke a task.
+metadata:
+  name: helloworld-goodbye-taskrun
+spec:
+  taskRef:
+    name: helloworld-goodbye          # Name of the task to be executed
+
+
+# command to see logs of the TaskRun (default step is step # 1 inside Task)
+# kubectl logs --selector=tekton.dev/taskRun=<NAME OF TASKRUN>
+# kubectl logs --selector=tekton.dev/taskRun=helloworld-goodbye-taskrun
+
+# to see logs of specific step
+# kubectl logs --selector=tekton.dev/taskRun=<NAME OF TASKRUN> -c step-<name of the step here>
+# kubectl logs --selector=tekton.dev/taskRun=helloworld-goodbye-taskrun -c step-goodbye
+
+# OR to see logs collectively of entire pipeline
+# tkn pipelinerun logs <name of pipeline run> -f -n default
