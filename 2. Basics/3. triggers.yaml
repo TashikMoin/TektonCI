@@ -1,0 +1,110 @@
+# Pre-requisite : pipeline created in 2nd step (2. pipeline.yaml)
+
+---
+# A TriggerTemplate defines what happens/what-to-do("generate and execute" a tekton CRD from 
+# trigger template for e.g generating a PipelineRun crd to execute/run any pipeline when an event 
+# is triggered/detected) 
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: hello-goodbye-trigger-template
+spec:
+  params:
+  - name: username
+    default: "Kubernetes"
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: hello-goodbye-run-
+    spec:
+      pipelineRef:
+        name: hello-goodbye
+      params:
+      - name: username
+        value: $(tt.params.username)
+
+
+---
+# TriggerBinding is used to send data to triggertemplate when an event is detected.
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: hello-goodbye-trigger-binding
+spec: 
+  params:
+  - name: username
+    value: $(body.username)   
+# This triggerbinding itself is reading data from the event/request 's body and passing it to 
+# trigger template after the event is triggered. The triggertemplate then dynamically on runtime 
+# generates a tekton crd "BASED ON THIS EVENT OR DATA PASSED TO TRIGGERBINDING FROM EVENT" 
+# (for e.g TriggerTemplate generating a PipelineRun crd and then executing it)
+
+
+---
+# A event listener service to listen for some event. Using this CRD, we also tell what actions to do by telling the triggertemplate name
+# so that the triggertemplate can generate a tekton CRD and execute it using some data passed to it using triggerbinding. 
+
+# In this CRD, we are also telling the triggerbinding name so that when a event is triggered, the event data will be sent to this "xyz.." 
+# triggerbinding and the triggerbinding then sends event data to triggertemplate to generate a tekton CRD and execute it.
+
+# This CRD creates a kubernetes ClusterIP service behind the scene with "el" prefix. 
+
+# Create a curl pod to trigger event using the following,
+# kubectl run -it --rm --image=curlimages/curl curl-pod -- sh
+
+# execute following command inside curl pod to trigger event,
+# curl -v -H 'content-Type: application/json' -d '{"username": "Tekton"}' http://<service internal/cluster ip>:8080
+# for e.g --> curl -v -H 'content-Type: application/json' -d '{"username": "Tekton"}' http://10.0.75.58:8080
+
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: hello-goodbye-event-listener
+spec:
+  serviceAccountName: tekton-robot
+  triggers:
+    - name: hello-goodbye-event-trigger 
+      bindings:
+      - ref: hello-goodbye-trigger-binding      # This should match with triggerbinding name so that event can send event data to this triggerbinding.
+      template:
+        ref: hello-goodbye-trigger-template     # This should match with triggertemplate name. Triggerbinding then sends data to this triggertemplate.
+
+
+---
+# A service account for eventlistener.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-robot
+
+
+---
+# A RoleBinding for eventlistener to bind service account with a ClusterRole.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: triggers-example-eventlistener-binding
+subjects:
+- kind: ServiceAccount
+  name: tekton-robot
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-roles
+
+
+---
+# A ClusterRoleBinding for eventlistener to bind service account with another ClusterRole.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggers-example-eventlistener-clusterbinding
+subjects:
+- kind: ServiceAccount
+  name: tekton-robot
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-clusterroles

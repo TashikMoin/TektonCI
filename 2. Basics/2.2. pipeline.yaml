@@ -1,0 +1,147 @@
+# This file will create 2 tasks and execute them from a Pipeline <-- PipelineRun CRDs.
+
+# Tasks will be referenced inside pipeline CRD and then we will execute/invoke 
+# the pipeline using PipelineRun CRD. This will create TaskRun automatically by looking at pipeline.
+
+---
+# Task # 1 (a task with just 1 step or container)
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello
+spec:
+  params:
+  - name: username                       # This parameter will be passed to this Task when it is invoked/executed.
+    type: string
+    default: Johndoe                     # If parameter value is not passed it will use this default value.
+  workspaces:                            # These workspaces/volumes will be sent to the Task from either PipelineRun or TaskRun, it depends on how we execute tasks (through pipelines, or directly using TaskRun).
+  - name: secret_password                # This workspace is reading data from a kubernetes secret. This workspace/volume is passed to this Task at the time of execution from either TaskRun CRD or PipelineRun CRD.
+    readOnly: true                       # To restrict task to only read from the passed workspace volume because this volume data is coming from a kubernetes secret.
+  - name: fruits                         # This workspace is reading data from a kubernetes configmap.
+    readOnly: true                       # To restrict task to only read from the passed workspace volume because this volume data is coming from a kubernetes configmap.
+  - name: password_status                # Adding another workspace/volume to a pod(task) for file creation, accessible by other tasks/pods. This workspace is reading data from a kubernetes PVC.
+  
+  # By defining a workspace, we indicate that this task assumes the availability of the specified workspaces/volumes, which should 
+  # be "provided from the TaskRun or PipeRun CRD".
+  steps:
+  # workspace data usage using workspaces.<name of the workspace decalred in task>.path
+    - name: hello
+      image: ubuntu
+      script: |
+        #!/bin/bash
+        echo "$(params.username)! likes the following fruits,";
+        cat $(workspaces.fruits.path)/fruits.txt
+    
+    - name: validate-password
+      image: ubuntu
+      script: |
+        rm -rf $(workspaces.password_status.path)/password_status.txt;
+        if [ "hunter2" = "$(cat $(workspaces.secret_password.path)/password)" ]; then
+          echo "correct password!" >> $(workspaces.password_status.path)/password_status.txt
+        else
+          echo "wrong password!" >> $(workspaces.password_status.path)/password_status.txt
+        fi
+      # This script is reading password from a secret workspace and writing the password validation output to a pvc volume which is shared with task # 2.
+
+---
+# Task # 2 (a task with just 1 step or container)
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: goodbye
+spec:
+  params:
+  - name: username                       # This parameter will be passed to this Task when it is invoked/executed.
+    type: string
+    default: "Foobar"                    # If parameter value is not passed it will use this default value.
+  workspaces:                            # These workspaces/volumes will be sent to the Task from either PipelineRun or TaskRun, it depends on how we execute tasks (through pipelines, or directly using TaskRun).
+  - name: check_password_status          
+  # The workspaces check_password_status, and password_status (from previous task) are same but their declaration/name in tasks is different.
+  # Task # 1 has written a password_status.txt file on root path of this workspace/volume. Now this task will read/cat that file to see the password status.
+  # This will prove that this workspace/volume was shared between the two tasks/pods as this volume was created using a PVC and was not a ephemeral volume.
+  steps:
+    - name: print-secrets
+      image: ubuntu
+      script: cat $(workspaces.check_password_status.path)/password_status.txt
+    - name: goodbye
+      image: ubuntu
+      script: |
+        #!/bin/bash
+        echo "goodbye $(params.username)!"  
+
+
+---
+# Pipeline to execute above tasks
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: hello-goodbye
+spec:
+  params:
+  - name: username
+    type: string
+    default: Jack
+
+  workspaces:                        # workspace declaration. These workspaces/volumes will be passed to pipeline by PipelineRun CRD.
+  - name: secret-workspace
+  - name: configmap-workspace
+  - name: pvc-workspace
+
+  tasks:
+  # by default, tasks run in parallel if there is no dependency between tasks.
+  
+    - name: first-task                 # The name of the 1st task in the pipeline        
+      taskRef:
+        name: hello                    # This is a reference to first task. It should match with the 1st task name we just created above using Task CRD.
+      workspaces:                      # <- mapping workspace here to use the workspace declared above inside pipeline specs object.
+      - name: secret_password          # This should match with the workspace declaration that Task CRD expects! This wokrspace will be passed to Task with this name.
+        workspace: secret-workspace    # should match with above declaration of workspace under spec object.
+      - name: fruits                   # This should match with the workspace declaration that Task CRD expects! This wokrspace will be passed to Task with this name.
+        workspace: configmap-workspace # should match with above declaration of workspace under spec object.
+      - name: password_status          # This should match with the workspace declaration that Task CRD expects! This wokrspace will be passed to Task with this name.
+        workspace: pvc-workspace       # should match with above declaration of workspace under spec object.
+
+    - name: second-task              # The name of the 2nd task in the pipeline
+      runAfter:                     
+        - first-task                 # it should match with the pipeline task name defined inside pipeline and not with the actual task name defined inside the task CRD.
+      taskRef:
+        name: goodbye                # This is a reference to second task. It should match with the 2nd task name we just created above using Task CRD.
+      params:
+      - name: username
+        value: $(params.username)    # Passing value of parameter username to the 2nd task only. The value of this parameter is passed from pipeline parameters using params.<pipeline parameter here> syntax
+      workspaces:                    # <- mapping workspace here to use the workspace declared above inside pipeline specs object.
+      - name: check_password_status  # This should match with the workspace declaration that Task CRD expects! This wokrspace will be passed to Task with this name.
+        workspace: pvc-workspace     # should match with above declaration of workspace under spec object.
+
+---
+# PipelineRun to execute above Pipeline
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: hello-goodbye-pipeline-run
+spec:
+  pipelineRef:                       # reference to pipeline we created above.
+    name: hello-goodbye
+  params:
+  - name: username                   # passing parameter to the pipeline when pipeline is invoked/executed.
+    value: "Tekton"         
+
+  workspaces:
+  - name: secret-workspace             # reading secret and then a workspace/volume will be passed to pipeline crd with this name.
+    secret:
+      secretName: johndoe-secret
+
+  - name: configmap-workspace          # reading configmap and then a workspace/volume will be passed to pipeline crd with this name.
+    configMap:
+      name: johndoe-configmap
+      items:
+      - key: fruits_list               # key defined inside configmap
+        path: fruits.txt               # putting the value on above key to this path inside the configmap volume/workspace.
+
+  - name: pvc-workspace                # mounting a pvc and then a workspace/volume will be passed to pipeline crd with this name.
+    persistentVolumeClaim:
+      claimName: johndoe-pvc    
+
+
+# to see logs of the pipeline
+# kubectl logs $(kubectl get pods -o name | grep <name of the pipeline task pod here>)

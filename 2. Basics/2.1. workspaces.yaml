@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: johndoe-configmap
+data:
+  fruits_list: |
+    1. Apples
+    2. Oranges
+    3. Mangoes
+    4. Grapes
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: johndoe-secret
+type: Opaque
+data:
+  password: aHVudGVyMg==
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: johndoe-pvc
+spec:
+  resources:
+    requests:
+      storage: 16Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce

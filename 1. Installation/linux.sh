@@ -1,3 +1,9 @@
+# dashboard
+kubectl apply --filename \
+https://storage.googleapis.com/tekton-releases/dashboard/latest/release-full.yaml
+
+kuebctl apply --filename dashboard-permissions.yaml
+
 # pipeline 
 kubectl apply --filename \
 https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
@@ -7,6 +13,14 @@ kubectl apply --filename \
 https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
 kubectl apply --filename \
 https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
+
+# chains
+kubectl apply --filename \
+https://storage.googleapis.com/tekton-releases/chains/latest/release.yaml
+
+# configure Tekton Chains to store the provenance metadata locally
+kubectl patch configmap chains-config -n tekton-chains \
+-p='{"data":{"artifacts.oci.storage": "", "artifacts.taskrun.format":"in-toto", "artifacts.taskrun.storage": "tekton"}}'
 
 # tkn cli
 sudo apt update;sudo apt install -y gnupg
