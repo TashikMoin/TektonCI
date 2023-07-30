@@ -43,6 +43,23 @@ spec:
         fi
       # This script is reading password from a secret workspace and writing the password validation output to a pvc volume which is shared with task # 2.
 
+
+# WORKSPACE ATTRIBUTES inside a Task CRD
+# name - (required) A unique string identifier that can be used to refer to the workspace
+# description - An informative string describing the purpose of the Workspace
+# readOnly - A boolean declaring whether the Task will write to the Workspace. Defaults to false.
+# optional - A boolean indicating whether a TaskRun can omit the Workspace. Defaults to false.
+# mountPath - A path to a location on disk where the workspace will be available to Steps. If a mountPath is not provided the workspace will be placed by default at /workspace/<name> where <name> is the workspace’s unique name.
+
+
+# example of optional workspace inside TASK CRD
+  # workspaces:
+  #   - name: messages
+  #     description: |
+  #       "The folder where we write the message to. If no workspace
+  #       is provided then the message will not be written."                <----- Read this message to understand optional workspaces.     
+  #     optional: true
+  #     mountPath: /custom/path/relative/to/root
 ---
 # Task # 2 (a task with just 1 step or container)
 apiVersion: tekton.dev/v1beta1
@@ -130,6 +147,7 @@ spec:
   - name: secret-workspace             # reading secret and then a workspace/volume will be passed to pipeline crd with this name.
     secret:
       secretName: johndoe-secret
+    # subPath: /abc/xyz                # To give only access of this subPath of the volume and pass it as workspace to the pipeline and its tasks.
 
   - name: configmap-workspace          # reading configmap and then a workspace/volume will be passed to pipeline crd with this name.
     configMap:
@@ -137,11 +155,46 @@ spec:
       items:
       - key: fruits_list               # key defined inside configmap
         path: fruits.txt               # putting the value on above key to this path inside the configmap volume/workspace.
+    # subPath: /abc/xyz                # To give only access of this subPath of the volume and pass it as workspace to the pipeline and its tasks.
 
   - name: pvc-workspace                # mounting a pvc and then a workspace/volume will be passed to pipeline crd with this name.
     persistentVolumeClaim:
-      claimName: johndoe-pvc    
+      claimName: johndoe-pvc           # to use existing pvc
+    # subPath: /abc/xyz                # To give only access of this subPath of the volume and pass it as workspace to the pipeline and its tasks.
 
+
+  # - name: myworkspace
+  #   volumeClaimTemplate:             # pvc template to create a new PVC from scratch if it does not exist.
+  #     spec:
+  #       accessModes:
+  #         - ReadWriteOnce
+  #       resources:
+  #         requests:
+  #           storage: 1Gi
+  #   # subPath: /abc/xyz                # To give only access of this subPath of the volume and pass it as workspace to the pipeline and its tasks.
+
+  # - name: myworkspace
+  #   emptyDir: {}                     # empty dir volumes cannot be used for sharing purpose because they are emphemeral!
+
+  # - name: readonly-workspace
+  #   projected:                       # projected volume sources are always mounted as read-only. Steps cannot write to them and will error out if they try.
+  #     sources:                       # configMap, secret, serviceAccountToken and downwardApi can be used as projected volumes.
+  #       - configMap:
+  #           name: my-configmap
+  #       - secret:
+  #           name: my-secret
+  #   # subPath: /abc/xyz                # To give only access of this subPath of the volume and pass it as workspace to the pipeline and its tasks.
+
+  # - name: my-credentials
+  #   csi:                            # csi volume sources require a volume driver to use, which must correspond to the value by the CSI driver as defined in the CSI spec.
+  #     driver: secrets-store.csi.k8s.io
+  #     readOnly: true
+  #     volumeAttributes:
+  #       secretProviderClass: "vault-database"
+  #   # subPath: /abc/xyz                # To give only access of this subPath of the volume and pass it as workspace to the pipeline and its tasks.
+
+
+  # To read more about workspaces: https://tekton.dev/docs/pipelines/workspaces/#using-persistentvolumeclaims-as-volumesource
 
 # to see logs of the pipeline
 # kubectl logs $(kubectl get pods -o name | grep <name of the pipeline task pod here>)

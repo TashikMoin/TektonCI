@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: build-test-deploy-pipeline-pipelinerun
+spec:
+  serviceAccountName: build-test-deploy-pipeline-sa
+  params:
+  - name: repo-url
+    value: ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git
+  pipelineRef:
+    name: build-test-deploy-pipeline
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+  - name: ssh-credentials
+    secret:
+      secretName: github-ssh-key
+  - name: shared-data
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

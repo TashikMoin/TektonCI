@@ -18,6 +18,7 @@ https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
 kubectl apply --filename \
 https://storage.googleapis.com/tekton-releases/chains/latest/release.yaml
 
+
 # configure Tekton Chains to store the provenance metadata locally
 kubectl patch configmap chains-config -n tekton-chains \
 -p='{"data":{"artifacts.oci.storage": "", "artifacts.taskrun.format":"in-toto", "artifacts.taskrun.storage": "tekton"}}'

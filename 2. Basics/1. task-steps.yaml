@@ -27,6 +27,11 @@ metadata:
 spec:
   taskRef:
     name: helloworld-goodbye          # Name of the task to be executed
+    
+  # workspaces:                       # To send workspace volume to a task from TaskRun
+  #   - name: myworkspace # this workspace name must be declared in the Task
+  #     emptyDir: {}      # emptyDir volumes can be used for TaskRuns, 
+  #                       # but consider using a PersistentVolumeClaim for PipelineRuns
 
 
 # command to see logs of the TaskRun (default step is step # 1 inside Task)

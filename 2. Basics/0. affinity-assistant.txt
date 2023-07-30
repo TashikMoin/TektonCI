@@ -1,0 +1,15 @@
+Affinity Assistant in Tekton is like a smart supervisor that helps you assign tasks to the right 
+workers (nodes in the Kubernetes cluster). It ensures that tasks are given to the most suitable workers 
+based on their capabilities and preferences.
+
+For example, if a certain task requires a lot of memory, the Affinity Assistant will assign it to a 
+worker (node) with plenty of memory available. Or if two tasks need to work together closely, it will 
+put them on the same worker (node) to avoid communication delays.
+
+In short, Affinity Assistant in Tekton helps optimize the workload distribution, making sure tasks are 
+assigned to the best workers (nodes) to get the job done faster and more efficiently.
+
+
+Note: Affinity Assistant use Inter-pod affinity and anti-affinity that require substantial amount of 
+processing which can slow down scheduling in large clusters significantly. We do not recommend using 
+them in clusters larger than several hundred nodes
