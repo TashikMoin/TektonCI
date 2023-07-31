@@ -60,6 +60,12 @@ spec:
   #       is provided then the message will not be written."                <----- Read this message to understand optional workspaces.     
   #     optional: true
   #     mountPath: /custom/path/relative/to/root
+
+# $(workspaces.<name>.path) - specifies the path to a Workspace where <name> is the name of the Workspace. This will be an empty string when a Workspace is declared optional and not provided by a TaskRun.
+# $(workspaces.<name>.bound) - either true or false, specifies whether a workspace was bound. Always true if the workspace is required.
+# $(workspaces.<name>.claim) - specifies the name of the PersistentVolumeClaim used as a volume source for the Workspace where <name> is the name of the Workspace. If a volume source other than PersistentVolumeClaim is used, an empty string is returned.
+# $(workspaces.<name>.volume)- specifies the name of the Volume provided for a Workspace where <name> is the name of the Workspace
+
 ---
 # Task # 2 (a task with just 1 step or container)
 apiVersion: tekton.dev/v1beta1

@@ -1,0 +1,68 @@
+---
+# A service account for eventlistener.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: build-test-deploy-sa
+
+
+---
+# A RoleBinding for eventlistener to bind service account with a ClusterRole.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: build-test-deploy-pipeline-role-binding
+subjects:
+- kind: ServiceAccount
+  name: build-test-deploy-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-roles
+
+
+---
+# A ClusterRoleBinding for eventlistener to bind service account with another ClusterRole.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: build-test-deploy-pipeline-cluster-role-binding
+subjects:
+- kind: ServiceAccount
+  name: build-test-deploy-sa
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-clusterroles
+
+
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: build-test-deploy-pipeline-event-listener
+spec:
+  resources:
+    kubernetesResource:
+      serviceType: LoadBalancer
+  serviceAccountName: build-test-deploy-sa
+  triggers:
+    - name: hello-goodbye-event-trigger 
+      bindings:
+      - ref: build-test-deploy-pipeline-tb      # This should match with triggerbinding name so that event can send event data to this triggerbinding.
+      template:
+        ref: build-test-deploy-pipeline-tt      # This should match with triggertemplate name. Triggerbinding then sends data to this triggertemplate. 
+
+
+#  URL="ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git" && \
+#  EL_HOST=$(kubectl get svc el-build-test-deploy-pipeline-event-listener -o=jsonpath='{.status.loadBalancer.ingress[0].ip}') && \
+#  curl -v \
+#     -H 'X-GitHub-Event: pull_request' \
+#     -H 'Content-Type: application/json' \
+#     -H 'Connection: close' \
+#     -d '{
+#       "repository": {"ssh_url": "'"${URL}"'"},
+#       "pull_request": {"head": {"sha": "main"}}
+#     }' \
+#     ${EL_HOST}:8080

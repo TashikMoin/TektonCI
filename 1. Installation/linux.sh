@@ -23,6 +23,9 @@ https://storage.googleapis.com/tekton-releases/chains/latest/release.yaml
 kubectl patch configmap chains-config -n tekton-chains \
 -p='{"data":{"artifacts.oci.storage": "", "artifacts.taskrun.format":"in-toto", "artifacts.taskrun.storage": "tekton"}}'
 
+# kaniko
+kubectl apply -f https://api.hub.tekton.dev/v1/resource/tekton/task/kaniko/0.6/raw
+
 # tkn cli
 sudo apt update;sudo apt install -y gnupg
 sudo mkdir -p /etc/apt/keyrings/

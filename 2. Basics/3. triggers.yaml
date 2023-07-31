@@ -1,7 +1,7 @@
 # Pre-requisite : pipeline created in 2nd step (2. pipeline.yaml)
 
 ---
-# A TriggerTemplate defines what happens/what-to-do("generate and execute" a tekton CRD from 
+# A TriggerTemplate defines what happens/what-to-do("generate and execute" a ANY+MULTIPLE KUBERNETES RESOURCES from 
 # trigger template for e.g generating a PipelineRun crd to execute/run any pipeline when an event 
 # is triggered/detected) 
 apiVersion: triggers.tekton.dev/v1beta1
@@ -24,6 +24,16 @@ spec:
       - name: username
         value: $(tt.params.username)
 
+# add more elements to resourcetemplates: array if you want to create multiple kubernetes resources for e.g multiple tekton pipelinerun resources when a event is triggered.
+  # - apiVersion: tekton.dev/v1beta1
+  #   kind: PipelineRun
+  #   metadata:
+  #     name: build-test-deploy-pipeline-pipelinerun
+  #   spec:
+  #     serviceAccountName: build-test-deploy-pipeline-sa
+  #     params:
+  #     - name: repo-url
+
 
 ---
 # TriggerBinding is used to send data to triggertemplate when an event is detected.
@@ -35,18 +45,22 @@ spec:
   params:
   - name: username
     value: $(body.username)   
+# https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#pullrequestevent
+
 # This triggerbinding itself is reading data from the event/request 's body and passing it to 
-# trigger template after the event is triggered. The triggertemplate then dynamically on runtime 
-# generates a tekton crd "BASED ON THIS EVENT OR DATA PASSED TO TRIGGERBINDING FROM EVENT" 
-# (for e.g TriggerTemplate generating a PipelineRun crd and then executing it)
+# trigger template after the event is triggered. This username is coming from the request payload. 
+# For example, for a github pull request, it can come from the link shared above. The triggertemplate 
+# then dynamically on runtime generates a ANY+MULTIPLE KUBERNETES RESOURCES "BASED ON THIS EVENT OR 
+# DATA PASSED TO TRIGGERBINDING FROM EVENT" (for e.g TriggerTemplate generating a PipelineRun crd and 
+# then executing it)
 
 
 ---
 # A event listener service to listen for some event. Using this CRD, we also tell what actions to do by telling the triggertemplate name
-# so that the triggertemplate can generate a tekton CRD and execute it using some data passed to it using triggerbinding. 
+# so that the triggertemplate can generate a ANY+MULTIPLE KUBERNETES RESOURCES and execute it using some data passed to it using triggerbinding. 
 
 # In this CRD, we are also telling the triggerbinding name so that when a event is triggered, the event data will be sent to this "xyz.." 
-# triggerbinding and the triggerbinding then sends event data to triggertemplate to generate a tekton CRD and execute it.
+# triggerbinding and the triggerbinding then sends event data to triggertemplate to generate a ANY+MULTIPLE KUBERNETES RESOURCES and execute it.
 
 # This CRD creates a kubernetes ClusterIP service behind the scene with "el" prefix. 
 

@@ -7,15 +7,23 @@ spec:
   params:
   - name: repo-url
     value: ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git
+  - name: BUILDER_IMAGE
+    value: gcr.io/kaniko-project/executor:v1.5.1
+  - name: CONTEXT
+    value: ./
+  - name: DOCKERFILE
+    value: /workspace/source/ 
+  - name: IMAGE
+    value: tashikmoin/johndoe-java-microservice:1
   pipelineRef:
     name: build-test-deploy-pipeline
   podTemplate:
     securityContext:
       fsGroup: 65532
   workspaces:
-  - name: ssh-credentials
+  - name: pipeline-secrets
     secret:
-      secretName: github-ssh-key
+      secretName: pipeline-secrets
   - name: shared-data
     volumeClaimTemplate:
       spec:
