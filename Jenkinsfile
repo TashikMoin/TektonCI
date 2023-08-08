@@ -1,13 +1,16 @@
 pipeline {
-    agent any
+  agent {
+    kubernetes {
+      yamlFile 'Agent.yaml'
+    }
+  }
     stages {
-        stage ('Invoke tekton') {
-            steps {
-                script {
-                    echo "Helloworld!";
-                    kubectl get pods;
-                }
-            }
-        }
+      stage('Invoke Tekton') {     
+        steps {
+          container('kubectl') {
+            sh 'kubectl get pods'
+          }
+        } 
+      }
     }
 }
