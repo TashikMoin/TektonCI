@@ -8,7 +8,10 @@ pipeline {
       stage('Invoke Tekton') {     
         steps {
           container('kubectl') {
-            sh 'kubectl get pods'
+            sh '''
+            kubectl get pods -n tekton-pipelines;
+            kubectl get pods -n default;
+            '''
           }
         } 
       }
