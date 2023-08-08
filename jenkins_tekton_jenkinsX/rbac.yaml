@@ -1,0 +1,47 @@
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tekton
+  namespace: tekton-pipelines # namespace where tekton is installed
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/log
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - tekton.dev
+    resources:
+      - tasks
+      - taskruns
+      - pipelines
+      - pipelineruns
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-role-binding
+  namespace: tekton-pipelines # namespace where tekton is installed
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tekton
+subjects:
+  - kind: ServiceAccount
+    name: jenkins # name of the jenkins service account
+    namespace: jenkins # namespace where jenkins is installed
