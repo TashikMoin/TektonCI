@@ -4,7 +4,8 @@ pipeline {
         stage ('Invoke tekton') {
             steps {
                 script {
-                    echo "Helloworld!"
+                    echo "Helloworld!";
+                    kubectl get pods;
                 }
             }
         }
