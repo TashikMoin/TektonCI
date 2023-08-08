@@ -10,7 +10,7 @@ pipeline {
           container('kubectl') {
             sh '''
             kubectl get pods -n tekton-pipelines;
-            kubectl get pods -n default;
+            ls -a;
             '''
           }
         } 
