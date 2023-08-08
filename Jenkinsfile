@@ -1,10 +1,11 @@
 pipeline {
     agent any
     stages {
-        stage('build') {
+        stage ('Invoke tekton') {
             steps {
-                checkout scm
-                tektonCreateRaw(input: 'pipelinerun_from_jenkins.yaml', inputType: "FILE", namespace: 'tekton-pipelines')
+                script {
+                    echo "Helloworld!"
+                }
             }
         }
     }
