@@ -1,5 +1,3 @@
-def COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true)
-
 pipeline {
   agent {
     kubernetes {
