@@ -11,7 +11,8 @@ pipeline {
             sh '''
             'sed -i "s/<COMMIT>/${BUILD_NUMBER}/" pipelinerun_from_jenkins.yaml;'
             'sed -i "s/<TAG>/${BUILD_NUMBER}/" pipelinerun_from_jenkins.yaml;'
-            'kubectl apply -f pipelinerun_from_jenkins.yaml;'
+            ls -a;
+            kubectl apply -f pipelinerun_from_jenkins.yaml;
             '''
           }
         } 
