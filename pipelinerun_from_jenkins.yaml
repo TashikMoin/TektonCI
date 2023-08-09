@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   name: build-test-deploy-pipeline-pipelinerun-<COMMIT>
-  namespace: tekton-pipelines
+  namespace: default
 spec:
   serviceAccountName: build-test-deploy-pipeline-sa
   params:
