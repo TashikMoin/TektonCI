@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: build-test-deploy-pipeline-pipelinerun
+  name: build-test-deploy-pipeline-pipelinerun-<COMMIT>
 spec:
   serviceAccountName: build-test-deploy-pipeline-sa
   params:
@@ -14,7 +14,7 @@ spec:
   - name: DOCKERFILE
     value: /workspace/source/ 
   - name: IMAGE
-    value: tashikmoin/johndoe-java-microservice:1
+    value: tashikmoin/johndoe-java-microservice:<TAG>
   pipelineRef:
     name: build-test-deploy-pipeline
   podTemplate:
