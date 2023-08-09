@@ -15,7 +15,7 @@ pipeline {
                     kubectl apply -f pipelinerun_from_jenkins.yaml
                     kubectl logs -f -l tekton.dev/pipelineRun=build-test-deploy-pipeline-pipelinerun-${BUILD_NUMBER} --all-containers --max-log-requests 100
                 ''', returnStdout: true).trim()
-                echo "Captured logs: \n${logs}"
+                echo "PIPELINE LOGS \n${logs}\n"
             }
           }
         } 
