@@ -2,7 +2,7 @@
 kubectl apply --filename \
 https://storage.googleapis.com/tekton-releases/dashboard/latest/release-full.yaml
 
-kuebctl apply --filename dashboard-permissions.yaml
+kubectl apply --filename dashboard-permissions.yaml
 
 # pipeline 
 kubectl apply --filename \
