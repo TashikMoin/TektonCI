@@ -1,9 +1,5 @@
 pipeline {
-  agent {
-    kubernetes {
-      yamlFile 'Agent.yaml'
-    }
-  }
+  agent {label '!master'}
     stages {
       stage('Invoke Tekton') {     
         steps {
