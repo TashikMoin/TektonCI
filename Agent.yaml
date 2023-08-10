@@ -6,7 +6,7 @@ spec:
   serviceAccountName: jenkins
   containers:
     - name: kubectl
-      image: joshendriks/alpine-k8s
+      image: yonadev/jnlp-slave-k8s-helm
       command:
         - /bin/cat
       tty: true
