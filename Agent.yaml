@@ -3,9 +3,6 @@ kind: Pod
 metadata:
   name: kubectl
 spec:
-  volumes:
-    - name: logs
-      emptyDir: {}
   serviceAccountName: jenkins
   containers:
     - name: kubectl
@@ -13,11 +10,5 @@ spec:
       command:
         - /bin/cat
       tty: true
-      volumeMounts:
-        - name: logs
-          mountPath: /var/log
-    - name: logger # the sidecar container tracking logs and sending them to stdout
-      image: lutraman/logger-sidecar:v2
-      volumeMounts:
-        - name: logs
-          mountPath: /logs
+      stdin: true
+      stdout: true
