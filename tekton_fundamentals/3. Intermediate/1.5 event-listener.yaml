@@ -46,6 +46,7 @@ spec:
   resources:
     kubernetesResource:
       serviceType: LoadBalancer
+      servicePort: 80
   serviceAccountName: build-test-deploy-sa
   triggers:
     - name: hello-goodbye-event-trigger 
