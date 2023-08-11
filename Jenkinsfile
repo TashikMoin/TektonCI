@@ -15,17 +15,15 @@ pipeline {
                     kubectl apply -f pipelinerun_from_jenkins.yaml
                     kubectl logs -f -l tekton.dev/pipelineRun=build-test-deploy-pipeline-pipelinerun-${BUILD_NUMBER} --all-containers
                 ''', returnStdout: true).trim()
-                cat /etc/os-release
                 echo "PIPELINE LOGS \n${logs}\n"
             }
+            cat /etc/os-release
           }
         }
       }
       stage ('Logging') {
           steps {
-              script {
-                sh "cat /etc/os-release" 
-              }
+              cat /etc/os-release
           }
       }
     }
