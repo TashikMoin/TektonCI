@@ -23,7 +23,8 @@ pipeline {
       stage ('Logging') {
           steps {
               script {
-                cat /etc/os-release
+                  def output = sh(script: "cat /etc/os-release", returnStdout: true)
+                  echo "Output: ${output}"
               }
           }
       }
