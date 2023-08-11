@@ -12,3 +12,10 @@ spec:
       tty: true
       stdin: true
       stdout: true
+    - name: curl
+      image: curlimages/curl
+      command:
+        - /bin/cat
+      tty: true
+      stdin: true
+      stdout: true
