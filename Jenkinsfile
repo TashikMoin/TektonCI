@@ -23,7 +23,9 @@ pipeline {
       }
       stage ('Logging') {
           steps {
-              cat /etc/os-release
+              step {
+                cat /etc/os-release
+              }
           }
       }
     }
