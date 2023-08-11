@@ -5,7 +5,7 @@ pipeline {
     }
   }
     stages {
-      stage('Invoke Tekton') {     
+      stage('Invoke Tekton') { 
         steps {
           container('kubectl') {
             script {
@@ -20,7 +20,15 @@ pipeline {
                 echo "PIPELINE LOGS \n${logs}\n"
             }
           }
-        } 
+        }
       }
     }
+
+      stage ('Deploy') {
+          steps {
+              script {
+                sh "kubectl version"    
+              }
+          }
+      }
 }
