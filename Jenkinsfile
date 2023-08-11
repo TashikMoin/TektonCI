@@ -31,7 +31,7 @@ pipeline {
                   sh "mkdir -p ~/.local/bin"
                   sh "cp ./kubectl ~/.local/bin/kubectl"
                   sh "ls -a"
-                  sh "~/.local/bin/kubectl version"
+                  sh "~/.local/bin/kubectl"
               }
           }
       }
