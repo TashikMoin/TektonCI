@@ -25,13 +25,16 @@ pipeline {
               script {
                   def output = sh(script: "cat /etc/os-release", returnStdout: true)
                   echo "Output: ${output}"
-                  sh "curl -LO 'https://dl.k8s.io/release/\$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl'"
-                  sh "curl -LO 'https://dl.k8s.io/\$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256'"
-                  sh "chmod +x kubectl"
-                  sh "mkdir -p ~/.local/bin"
-                  sh "cp ./kubectl ~/.local/bin/kubectl"
-                  sh "ls -a"
-                  sh "~/.local/bin/kubectl"
+                  sh """
+                      #!/bin/bash
+                      curl -LO 'https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl'
+                      curl -LO 'https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256'
+                      chmod +x kubectl
+                      mkdir -p ~/.local/bin
+                      cp ./kubectl $HOME/.local/bin/kubectl
+                      ls -a
+                      $HOME/.local/bin/kubectl
+                  """
               }
           }
       }
