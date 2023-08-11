@@ -16,7 +16,6 @@ pipeline {
                     kubectl logs -f -l tekton.dev/pipelineRun=build-test-deploy-pipeline-pipelinerun-${BUILD_NUMBER} --all-containers
                 ''', returnStdout: true).trim()
                 echo "PIPELINE LOGS \n${logs}\n"
-                cat /etc/os-release
             }
           }
         }
