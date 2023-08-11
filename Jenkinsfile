@@ -27,13 +27,13 @@ pipeline {
                   echo "Output: ${output}"
                   sh """
                       #!/bin/bash
-                      curl -LO 'https://dl.k8s.io/release/\$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl'
-                      curl -LO 'https://dl.k8s.io/\$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256'
-                      chmod +x kubectl
-                      mkdir -p ~/.local/bin
-                      cp ./kubectl \$HOME/.local/bin/kubectl
-                      ls -a
-                      \$HOME/.local/bin/kubectl
+                      apt-get update
+                      apt-get install -y ca-certificates curl
+                      apt-get install -y apt-transport-https
+                      curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+                      echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+                      apt-get update
+                      apt-get install -y kubectl
                   """
               }
           }
