@@ -29,8 +29,9 @@ pipeline {
                   sh "curl -LO 'https://dl.k8s.io/\$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256'"
                   sh "chmod +x kubectl"
                   sh "mkdir -p ~/.local/bin"
-                  sh "mv ./kubectl ~/.local/bin/kubectl"
-                  sh "kubectl version"
+                  sh "cp ./kubectl ~/.local/bin/kubectl"
+                  sh "ls -a"
+                  sh "./kubectl version"
               }
           }
       }
