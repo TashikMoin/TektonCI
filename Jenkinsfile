@@ -24,7 +24,7 @@ pipeline {
           container('curl') {
             script {
               sh '''
-                curl http://nginx:80
+                curl http://nginx.default.svc.cluster.local
               '''
             }
           }
