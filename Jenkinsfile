@@ -24,7 +24,13 @@ pipeline {
           container('curl') {
             script {
               sh '''
-                curl http://nginx.default.svc.cluster.local
+                 curl -v \
+                  -H 'Content-Type: application/json' \
+                  -H 'Connection: close' \
+                  -d '{
+                    "BUILD_NUMBER": ${BUILD_NUMBER}
+                  }' \
+                  http://el-build-test-deploy-pipeline-event-listener.default.svc.cluster.local:8080
               '''
             }
           }
