@@ -30,7 +30,7 @@ pipeline {
                   -d '{
                     "BUILD_NUMBER": ${BUILD_NUMBER}
                   }' \
-                  http://el-build-test-deploy-pipeline-event-listener.default.svc.cluster.local:8080
+                  http://el-build-test-deploy-pipeline-event-listener.default.svc.cluster.local:80
               '''
             }
           }
