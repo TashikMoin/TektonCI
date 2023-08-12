@@ -4,10 +4,13 @@ metadata:
   name: build-test-deploy-pipeline-tb
 spec:
   params:
-  - name: URL
-    value: ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git   # it should come from event payload
-  - name: REVISION
-    value: xj35h23  # it should come from event payload
+  - name: url
+    value: $(body.url)
+  - name: revision
+    value: $(body.revision)
+  - name: build
+    value: $(body.build)
+    
 # to see complete payload data of github PR, visit, 
 # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#pullrequestevent
 # https://github.com/gogs/gogs/issues/1573
@@ -21,31 +24,35 @@ metadata:
 spec:
 
   params:
-  - name: URL
+  - name: url
     description: The repository url to build and deploy.
-  - name: REVISION
+  - name: revision
     description: The revision or sha of the commit.
+  - name: build
+    description: build number
 
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      generateName: build-test-deploy-pipeline-pipelinerun-
+      generateName: "build-test-deploy-pipeline-pipelinerun"
+      labels:
+        pipelineRunName: "build-test-deploy-pipeline-pipelinerun-$(tt.params.build)"
     spec:
       serviceAccountName: build-test-deploy-pipeline-sa
       params:
       - name: repo-url
-        value: ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git
-      - name: BUILDER_IMAGE
-        value: gcr.io/kaniko-project/executor:v1.5.1
-      - name: CONTEXT
-        value: ./
-      - name: DOCKERFILE
-        value: /workspace/source/ 
-      - name: IMAGE
-        value: tashikmoin/johndoe-java-microservice:ki86nf
+        value: "$(tt.params.url)"
+      - name: builder-image
+        value: "$(tt.params.builderImage)"
+      - name: context
+        value: "$(tt.params.context)"
+      - name: dockerfile
+        value: "$(tt.params.dockerfile)"
+      - name: image
+        value: "$(tt.params.image)"
       pipelineRef:
-        name: build-test-deploy-pipeline
+        name: "$(tt.params.pipelineName)"
       podTemplate:
         securityContext:
           fsGroup: 65532
