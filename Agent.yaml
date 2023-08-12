@@ -13,9 +13,7 @@ spec:
       stdin: true
       stdout: true
     - name: curl
-      image: curlimages/curl
-      command:
-        - /bin/cat
+      image: praqma/network-multitool
       tty: true
       stdin: true
       stdout: true
