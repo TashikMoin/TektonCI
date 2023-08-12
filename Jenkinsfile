@@ -28,7 +28,7 @@ pipeline {
                   -H 'Content-Type: application/json' \
                   -H 'Connection: close' \
                   -d '{
-                    "BUILD_NUMBER": ${BUILD_NUMBER}
+                    "BUILD_NUMBER": "'"$BUILD_NUMBER"'"
                   }' \
                   http://el-build-test-deploy-pipeline-event-listener.default.svc.cluster.local:80
               '''
