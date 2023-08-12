@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
-  name: build-test-deploy-pipeline-tb
+  name: johndoe-tb
 spec:
   params:
   - name: url
@@ -10,6 +10,18 @@ spec:
     value: $(body.revision)
   - name: build
     value: $(body.build)
+  - name: dockerfile
+    value: $(body.dockerfile)
+  - name: context
+    value: $(body.context)
+  - name: image
+    value: $(body.image)
+  - name: imageBuilder
+    value: $(body.imageBuilder)
+  - name: pipelineName
+    value: $(body.pipelineName)
+  - name: environment
+    value: $(body.environment)
     
 # to see complete payload data of github PR, visit, 
 # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#pullrequestevent
@@ -20,9 +32,8 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: build-test-deploy-pipeline-tt
+  name: johndoe-tt
 spec:
-
   params:
   - name: url
     description: The repository url to build and deploy.
@@ -30,37 +41,54 @@ spec:
     description: The revision or sha of the commit.
   - name: build
     description: build number
-
+  - name: dockerfile
+    description: path to dockerfile
+  - name: context
+    description: dockerfile build context/path relative to dockerfile path.
+  - name: image
+    description: service image name on registry
+  - name: imageBuilder
+    description: builder image name (docker, kaniko, etc)
+  - name: pipelineName
+    description: name of the pipeline
+  - name: environment
+    description: pipeline environment (dev, stg, prod)
+    
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      generateName: "build-test-deploy-pipeline-pipelinerun"
+      generateName: "johndoe-pipelinerun"
       labels:
-        pipelineRunName: "build-test-deploy-pipeline-pipelinerun-$(tt.params.build)"
+        pipelineRunName: "johndoe-pipelinerun-$(tt.params.build)"
     spec:
-      serviceAccountName: build-test-deploy-pipeline-sa
+      serviceAccountName: johndoe-sa
       params:
-      - name: repo-url
+      - name: url
         value: "$(tt.params.url)"
-      - name: builder-image
-        value: "$(tt.params.builderImage)"
+      - name: build
+        value: "$(tt.params.build)"
+      - name: revision
+        value: "$(tt.params.revision)"
+      - name: imageBuilder
+        value: "$(tt.params.imageBuilder)"
       - name: context
         value: "$(tt.params.context)"
       - name: dockerfile
         value: "$(tt.params.dockerfile)"
       - name: image
         value: "$(tt.params.image)"
+      - name: environment
+        value: "$(tt.params.environment)"
       pipelineRef:
-        name: "$(tt.params.pipelineName)"
+        name: "$(tt.params.pipelineName)-$(tt.params.environment)"
       podTemplate:
         securityContext:
           fsGroup: 65532
-          
       workspaces:
-      - name: pipeline-secrets
+      - name: johndoe-secrets
         secret:
-          secretName: pipeline-secrets
+          secretName: johndoe-secrets
       - name: shared-data
         volumeClaimTemplate:
           spec:

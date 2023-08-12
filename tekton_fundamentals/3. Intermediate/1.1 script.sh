@@ -1,5 +1,9 @@
-# Installing a Task from Tekton Hub
-# To use the git clone Task inside our pipeline, we have to install it on our cluster first. we can do this with the following command:
+# Installing Tasks from Tekton Hub into the Kubernetes cluster
 
+
+# git-clone task
 kubectl apply -f \
 https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-clone/0.6/git-clone.yaml
+
+# kaniko
+kubectl apply -f https://api.hub.tekton.dev/v1/resource/tekton/task/kaniko/0.6/raw
