@@ -42,7 +42,7 @@ pipeline {
               for (int i = 0; i < podNames.size(); i++) {
                   def podName = podNames[i]
                   echo "Inside loop"
-                  echo "\n${podName}"
+                  echo -e "\n${podName}"
               }
             }
           }
