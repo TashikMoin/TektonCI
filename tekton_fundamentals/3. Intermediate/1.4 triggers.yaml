@@ -86,9 +86,9 @@ spec:
         securityContext:
           fsGroup: 65532
       workspaces:
-      - name: johndoe-secrets
+      - name: pipeline-secrets
         secret:
-          secretName: johndoe-secrets
+          secretName: pipeline-secrets
       - name: shared-data
         volumeClaimTemplate:
           spec:
