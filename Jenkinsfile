@@ -41,17 +41,7 @@ pipeline {
               echo "Found pods: ${podNames}"
               for (int i = 0; i < podNames.size(); i++) {
                   def podName = podNames[i]
-                  stage("Logs for ${podName}") {
-                      steps {
-                        container('kubectl') {
-                          script {
-                            echo "Streaming logs for ${podName}"
-                            kubectl logs -f ${podName} --all-containers -n default
-                          }
-                        }
-                      }
-                    }
-                  }
+                  echo "\n${podName}"
               }
             }
           }
