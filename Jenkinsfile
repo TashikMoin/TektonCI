@@ -50,10 +50,6 @@ pipeline {
                       }
                   }
               }
-              sh '''
-              kubectl get pods -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} -n default
-              kubectl logs -n default -f -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} --all-containers --max-log-requests 10000
-              '''
             }
           }
         } 
