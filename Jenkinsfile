@@ -38,7 +38,8 @@ pipeline {
             script {
                 sh '''
                   sleep 25
-                  kubectl logs -n default -f -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} --all-containers --previous --max-log-requests 10000
+                  kubectl get pods -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} -n default
+                  kubectl logs -n default -f -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} --all-containers --max-log-requests 10000
                 '''
             }
           }
