@@ -39,6 +39,7 @@ pipeline {
               sleep 30
               def podNames = sh(script: "kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} -n default", returnStdout: true).trim().split('\n')
               echo "Found pods: ${podNames}"
+              echo "${podNames.size()}"
               for (int i = 1; i < podNames.size(); i++) {
                   def podName = podNames[i]
                   sh'''
