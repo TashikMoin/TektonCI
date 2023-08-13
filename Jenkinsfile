@@ -41,6 +41,7 @@ pipeline {
               echo "Found pods: ${podNames}"
               for (int i = 0; i < podNames.size(); i++) {
                   def podName = podNames[i]
+                  echo "Inside loop"
                   echo "\n${podName}"
               }
             }
