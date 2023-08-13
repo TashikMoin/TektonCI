@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: kubectl
+  namespace: jenkins
 spec:
   serviceAccountName: jenkins
   containers:
@@ -10,8 +11,6 @@ spec:
       command:
         - /bin/cat
       tty: true
-      stdin: true
-      stdout: true
     - name: curl
       image: praqma/network-multitool
       tty: true
