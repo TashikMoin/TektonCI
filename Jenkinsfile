@@ -39,10 +39,11 @@ pipeline {
               sleep 30
               def podNames = sh(script: "kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} -n default", returnStdout: true).trim().split('\n')
               echo "Found pods: ${podNames}"
-              for (int i = 0; i < podNames.size(); i++) {
+              for (int i = 1; i < podNames.size(); i++) {
                   def podName = podNames[i]
                   echo "Inside loop"
-                  echo -e "\n${podName}"
+                  echo "${podName}"
+                  kubectl logs -n default -f ${podName}  --all-containers
               }
             }
           }
