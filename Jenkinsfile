@@ -24,7 +24,7 @@ pipeline {
                     "pipelineName": "johndoe",
                     "environment": "dev"
                   }' \
-                  http://johndoe-event-listener.default.svc.cluster.local:80
+                  http://el-johndoe-event-listener.default.svc.cluster.local:80
               '''
             }
           }
