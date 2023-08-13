@@ -45,7 +45,7 @@ metadata:
 spec:
   resources:
     kubernetesResource:
-      serviceType: clusterIP
+      serviceType: ClusterIP
       servicePort: 80
   serviceAccountName: johndoe-sa
   triggers:
@@ -55,7 +55,7 @@ spec:
       template:
         ref: johndoe-tt
 
-        
+
 
 #  URL="ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git" && \
 #  EL_HOST=$(kubectl get svc el-johndoe-event-listener -o=jsonpath='{.status.loadBalancer.ingress[0].ip}') && \
