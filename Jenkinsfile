@@ -43,8 +43,12 @@ pipeline {
                   def podName = podNames[i]
                   stage("Logs for ${podName}") {
                       steps {
-                        echo "Streaming logs for ${podName}"
-                        kubectl logs -f ${podName} --all-containers -n default
+                        container('kubectl') {
+                          script {
+                            echo "Streaming logs for ${podName}"
+                            kubectl logs -f ${podName} --all-containers -n default
+                          }
+                        }
                       }
                     }
                   }
