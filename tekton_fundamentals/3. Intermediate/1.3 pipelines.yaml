@@ -26,7 +26,8 @@ spec:
     default: ./
   - name: dockerfile
     type: string
-    default: /workspace/source/      # because the cloned repository will be inside source workspace which is mounted to build task.
+    default: /workspace/source/
+    # because the cloned repository will be inside source workspace which is mounted to build task.
 
   workspaces:
   - name: pipeline-secrets
@@ -46,7 +47,7 @@ spec:
       workspace: shared-data
     params:
     - name: url
-      value: $(params.repo-url)
+      value: $(params.url)
 
   - name: build-and-push-to-docker-registry
     runAfter: ["checkout"]
