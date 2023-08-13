@@ -5,7 +5,8 @@ pipeline {
     }
   }
     stages {
-      stage('Invoke tekton pipeline using curl') {     
+      stage('Invoke tekton pipeline using curl') {   
+
         steps {
           container('curl') {
             script {
@@ -26,6 +27,18 @@ pipeline {
                   }' \
                   http://el-johndoe-event-listener.default.svc.cluster.local:80
               '''
+            }
+          }
+        } 
+      }
+
+      stage('Tekton Pipeline Logs') {     
+        steps {
+          container('kubectl') {
+            script {
+                '''
+                  kubectl logs -n default -f -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} --all-containers --max-log-requests 10000
+                '''
             }
           }
         } 

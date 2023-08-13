@@ -1,0 +1,75 @@
+# prod pipeline
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: johndoe-prod
+spec:
+  description: | 
+    A workflow to continuously integrate and continuously deliver/deploy a java spring microservice.
+
+  params:
+  - name: url
+    type: string
+    description: The git repo URL to clone from.
+    default: ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git
+  - name: revision
+    type: string
+  - name: imageBuilder
+    type: string
+    default: gcr.io/kaniko-project/executor:v1.5.1
+  - name: image
+    type: string
+    default: tashikmoin/johndoe-java-microservice:1
+  - name: context
+    type: string
+    default: ./
+  - name: dockerfile
+    type: string
+    default: /workspace/source/
+    # because the cloned repository will be inside source workspace which is mounted to build task.
+
+  workspaces:
+  - name: pipeline-secrets
+  - name: shared-data
+    description: | 
+      This workspace contains the cloned repo files, so they can be read by the
+      next task.
+
+  tasks:
+  - name: checkout
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: ssh-directory
+      workspace: pipeline-secrets
+    - name: output
+      workspace: shared-data
+    params:
+    - name: url
+      value: $(params.url)
+
+  - name: build-and-push-to-docker-registry
+    runAfter: ["checkout"]
+    taskRef:
+      name: kaniko
+    workspaces:
+    - name: source
+      workspace: shared-data
+    - name: dockerconfig
+      workspace: pipeline-secrets
+    params:
+    - name: IMAGE
+      value: $(params.image)
+    - name: BUILDER_IMAGE
+      value: $(params.imageBuilder)
+    - name: CONTEXT
+      value: $(params.context)
+
+  - name: deploy-to-kubernetes
+    runAfter: ["build-and-push-to-docker-registry"]
+    taskRef:
+      name: deploy
+    workspaces:
+    - name: k8-manifests
+      workspace: shared-data
