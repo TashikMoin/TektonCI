@@ -36,8 +36,8 @@ pipeline {
         steps {
           container('kubectl') {
             script {
-                '''
-                  kubectl logs -n default -f -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} --all-containers --max-log-requests 10000
+                sh '''
+                  kubectl logs -n default -f -l pipelineRunName=johndoe-pipelinerun-149 --all-containers --max-log-requests 10000
                 '''
             }
           }
