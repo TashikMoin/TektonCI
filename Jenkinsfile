@@ -36,6 +36,7 @@ pipeline {
         steps {
           container('kubectl') {
             script {
+              sleep 30
               def podNames = sh(script: "kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER}", returnStdout: true).trim().split('\n')
               echo "Found pods: ${podNames}"
               sh '''
