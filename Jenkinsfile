@@ -37,6 +37,7 @@ pipeline {
           container('kubectl') {
             script {
                 sh '''
+                  sleep 25
                   kubectl logs -n default -f -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} --all-containers --previous --max-log-requests 10000
                 '''
             }
