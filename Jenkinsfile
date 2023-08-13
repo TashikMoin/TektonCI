@@ -39,6 +39,17 @@ pipeline {
               sleep 30
               def podNames = sh(script: "kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} -n default", returnStdout: true).trim().split('\n')
               echo "Found pods: ${podNames}"
+              for (int i = 0; i < podNames.size(); i++) {
+                  def podName = podNames[i]
+                  stage("Logs for ${podName}") {
+                      steps {
+                          echo "Streaming logs for ${podName} -n default"
+                          script {
+                              sh "kubectl logs -f ${podName} --all-containers -n default"
+                          }
+                      }
+                  }
+              }
               sh '''
               kubectl get pods -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} -n default
               kubectl logs -n default -f -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} --all-containers --max-log-requests 10000
