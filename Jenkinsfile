@@ -5,20 +5,6 @@ pipeline {
     }
   }
     stages {
-      stage('Invoke tekton pipeline using kubectl') {     
-        steps {
-          container('kubectl') {
-            script {
-              sh '''
-                sed -i "s/<COMMIT>/${BUILD_NUMBER}/" pipelinerun_from_jenkins.yaml
-                sed -i "s/<TAG>/${BUILD_NUMBER}/" pipelinerun_from_jenkins.yaml
-                kubectl apply -f pipelinerun_from_jenkins.yaml
-                kubectl logs -f -l tekton.dev/pipelineRun=build-test-deploy-pipeline-pipelinerun-${BUILD_NUMBER} --all-containers
-              '''
-            }
-          }
-        } 
-      }
       stage('Invoke tekton pipeline using curl') {     
         steps {
           container('curl') {
@@ -28,9 +14,17 @@ pipeline {
                   -H 'Content-Type: application/json' \
                   -H 'Connection: close' \
                   -d '{
-                    "build": "'"$BUILD_NUMBER"'"
+                    "build": "'"$BUILD_NUMBER"'",
+                    "url": "ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git",
+                    "image": "tashikmoin/johndoe-java-microservice",
+                    "revision": "'"$BUILD_NUMBER"'",
+                    "dockerfile": "/workspace/source/",
+                    "context": "./",
+                    "imageBuilder": "gcr.io/kaniko-project/executor:v1.5.1",
+                    "pipelineName": "johndoe",
+                    "environment": "dev"
                   }' \
-                  http://el-build-test-deploy-pipeline-event-listener.default.svc.cluster.local:80
+                  http://johndoe-event-listener.default.svc.cluster.local:80
               '''
             }
           }

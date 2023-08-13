@@ -45,16 +45,17 @@ metadata:
 spec:
   resources:
     kubernetesResource:
-      serviceType: LoadBalancer
+      serviceType: clusterIP
       servicePort: 80
   serviceAccountName: johndoe-sa
   triggers:
-    - name: hello-goodbye-event-trigger 
+    - name: johndoe-trigger 
       bindings:
-      - ref: johndoe-tb      # This should match with triggerbinding name so that event can send event data to this triggerbinding.
+      - ref: johndoe-tb
       template:
-        ref: johndoe-tt      # This should match with triggertemplate name. Triggerbinding then sends data to this triggertemplate. 
+        ref: johndoe-tt
 
+        
 
 #  URL="ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git" && \
 #  EL_HOST=$(kubectl get svc el-johndoe-event-listener -o=jsonpath='{.status.loadBalancer.ingress[0].ip}') && \

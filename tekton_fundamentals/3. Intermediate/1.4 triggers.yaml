@@ -53,12 +53,12 @@ spec:
     description: name of the pipeline
   - name: environment
     description: pipeline environment (dev, stg, prod)
-    
+
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      generateName: "johndoe-pipelinerun"
+      generateName: "johndoe-pipelinerun-"
       labels:
         pipelineRunName: "johndoe-pipelinerun-$(tt.params.build)"
     spec:
