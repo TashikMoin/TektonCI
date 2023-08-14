@@ -46,9 +46,11 @@ pipeline {
               echo "${podNames.size()}"
               for (int i = 1; i < podNames.size(); i++) {
                   def podName = podNames[i]
+                  sh """
                   echo "Inside loop"
                   echo "${podName}"
                   kubectl logs -n default -f ${podName}  --all-containers
+                  """
               }
             }
           }
