@@ -69,10 +69,36 @@ spec:
     - name: CONTEXT
       value: $(params.context)
 
-  - name: deploy-to-kubernetes
-    runAfter: ["build-and-push-to-docker-registry"]
+  - name: deploy
     taskRef:
-      name: deploy
+      name: git-cli
+    runAfter:
+      - checkout 
+      - build-and-push-to-docker-registry
     workspaces:
-    - name: k8-manifests
+    - name: ssh-directory
+      workspace: pipeline-secrets
+    - name: source
       workspace: shared-data
+    params:
+    - name: build
+      value: $(params.build)
+    - name: GIT_USER_NAME
+      type: string
+      description: |
+        Git user name for performing git operation.
+      default: "tashikmoin"
+    - name: GIT_USER_EMAIL
+      type: string
+      description: |
+        Git user email for performing git operation.
+      default: "tashikmoinsheikh@gmail.com"
+    - name: GIT_SCRIPT
+      value: |
+        git clone https://github.com/TashikMoin/ArgoCD.git
+        cd ArgoCD/Manifest/
+        sed -E -i 's/(image: tashikmoin\/johndoe-java-microservice:)[^[:space:]]+/\1$(params.build)/'  deployment.yaml
+        git add .
+        git commit "updated image tag from TektonCI"
+        git push -u origin main
+        cat ArgoCD/Manifest/deployment.yaml
