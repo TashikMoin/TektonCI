@@ -24,6 +24,9 @@ spec:
   - name: context
     type: string
     default: ./
+  - name: build 
+    type: string
+    default: latest
   - name: dockerfile
     type: string
     default: /workspace/source/
