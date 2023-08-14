@@ -105,4 +105,4 @@ spec:
         git add .;
         echo "after git add .";
         git commit -m "updated image tag from TektonCI";
-        git push -u origin main;
+        git push;
