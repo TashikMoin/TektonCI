@@ -99,10 +99,9 @@ spec:
       value: $(params.git_user_email)
     - name: GIT_SCRIPT
       value: |
-        git clone https://github.com/TashikMoin/ArgoCD.git;
+        git clone git@github.com:TashikMoin/ArgoCD.git;
         cd ./ArgoCD/Manifest/;
         sed -E -i "s/(image: tashikmoin\/johndoe-java-microservice:)[^[:space:]]+/\1$(params.build)/"  deployment.yaml;
         git add .;
-        echo "after git add .";
         git commit -m "updated image tag from TektonCI";
         git push;
