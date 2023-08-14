@@ -106,7 +106,7 @@ spec:
         ls -a;
         echo "before sed";
         cat ArgoCD/Manifest/deployment.yaml;
-        sed -E -i 's/(image: tashikmoin\/johndoe-java-microservice:)[^[:space:]]+/\1$(params.build)/'  ArgoCD/Manifest/deployment.yaml;
+        sed -E -i "s/(image: tashikmoin\/johndoe-java-microservice:)[^[:space:]]+/\1$(params.build)/"  ArgoCD/Manifest/deployment.yaml;
         echo "after sed";
         cat ArgoCD/Manifest/deployment.yaml;
         git add .;

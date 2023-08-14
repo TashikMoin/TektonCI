@@ -105,12 +105,13 @@ spec:
         echo "after cd";
         ls -a;
         echo "before sed";
-        cat deployment.yaml;
+        cat ArgoCD/Manifest/deployment.yaml;
+        sed -E -i "s/(image: tashikmoin\/johndoe-java-microservice:)[^[:space:]]+/\1$(params.build)/"  ArgoCD/Manifest/deployment.yaml;
         echo "after sed";
-        cat deployment.yaml;
+        cat ArgoCD/Manifest/deployment.yaml;
         git add .;
         echo "after git add .";
-        git commit "updated image tag from TektonCI";
+        git commit -m "updated image tag from TektonCI";
         echo "after commit";
         git push -u origin main;
-        cat deployment.yaml;
+        cat ArgoCD/Manifest/deployment.yaml;
