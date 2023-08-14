@@ -20,7 +20,7 @@ spec:
     default: gcr.io/kaniko-project/executor:v1.5.1
   - name: image
     type: string
-    default: tashikmoin/johndoe-java-microservice:1
+    default: tashikmoin/johndoe-java-microservice
   - name: context
     type: string
     default: ./
@@ -60,7 +60,7 @@ spec:
       workspace: pipeline-secrets
     params:
     - name: IMAGE
-      value: $(params.image)
+      value: "$(params.image):$(params.build)"
     - name: BUILDER_IMAGE
       value: $(params.imageBuilder)
     - name: CONTEXT
