@@ -60,7 +60,7 @@ spec:
       workspace: pipeline-secrets
     params:
     - name: IMAGE
-      value: $(params.image)
+      value: "$(params.image):$(params.build)"
     - name: BUILDER_IMAGE
       value: $(params.imageBuilder)
     - name: CONTEXT
