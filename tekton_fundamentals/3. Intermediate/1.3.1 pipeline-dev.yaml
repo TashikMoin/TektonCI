@@ -50,30 +50,6 @@ spec:
       next task.
 
   tasks:
-  - name: deploy
-    taskRef:
-      name: git-cli
-    workspaces:
-    - name: ssh-directory
-      workspace: pipeline-secrets
-    - name: source
-      workspace: shared-data
-    params:
-    - name: build
-      value: $(params.build)
-    - name: GIT_USER_NAME
-      value: $(params.git_user_name)
-    - name: GIT_USER_EMAIL
-      value: $(params.git_user_email)
-    - name: GIT_SCRIPT
-      value: |
-        git clone git@github.com:TashikMoin/ArgoCD.git;
-        cd ./ArgoCD/Manifest/;
-        sed -E -i "s/(image: tashikmoin\/johndoe-java-microservice:)[^[:space:]]+/\1$(params.build)/"  deployment.yaml;
-        git add .;
-        git commit -m "updated image tag from TektonCI";
-        git push;
-
   - name: checkout
     taskRef:
       name: git-clone
@@ -102,3 +78,30 @@ spec:
       value: $(params.imageBuilder)
     - name: CONTEXT
       value: $(params.context)
+
+  - name: deploy
+    taskRef:
+      name: git-cli
+    runAfter:
+      - checkout 
+      - build-and-push-to-docker-registry
+    workspaces:
+    - name: ssh-directory
+      workspace: pipeline-secrets
+    - name: source
+      workspace: shared-data
+    params:
+    - name: build
+      value: $(params.build)
+    - name: GIT_USER_NAME
+      value: $(params.git_user_name)
+    - name: GIT_USER_EMAIL
+      value: $(params.git_user_email)
+    - name: GIT_SCRIPT
+      value: |
+        git clone git@github.com:TashikMoin/ArgoCD.git;
+        cd ./ArgoCD/Manifest/;
+        sed -E -i "s/(image: tashikmoin\/johndoe-java-microservice:)[^[:space:]]+/\1$(params.build)/"  deployment.yaml;
+        git add .;
+        git commit -m "updated image tag from TektonCI";
+        git push;
