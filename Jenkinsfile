@@ -33,7 +33,7 @@ pipeline {
                     "imageBuilder": "'"$imageBuilder"'",
                     "pipelineName": "'"$pipelineName"'",
                     "environment": "'"$environmentName"'", 
-                    "serviceName": "'"$serviceName"'"
+                    "serviceName": "'"johndoe"'"
                   }' \
                   http://el-johndoe-event-listener.default.svc.cluster.local:80
               '''
