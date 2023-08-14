@@ -20,6 +20,8 @@ spec:
     value: $(body.imageBuilder)
   - name: pipelineName
     value: $(body.pipelineName)
+  - name: serviceName
+    value: $(body.serviceName)
   - name: environment
     value: $(body.environment)
     
@@ -51,6 +53,8 @@ spec:
     description: builder image name (docker, kaniko, etc)
   - name: pipelineName
     description: name of the pipeline
+  - name: serviceName
+    description: name of the service.
   - name: environment
     description: pipeline environment (dev, stg, prod)
 
@@ -60,7 +64,7 @@ spec:
     metadata:
       generateName: "johndoe-pipelinerun-"
       labels:
-        pipelineRunName: "johndoe-pipelinerun-$(tt.params.build)"
+        pipelineRunName: "$(tt.params.serviceName)-$(tt.params.build)"
     spec:
       serviceAccountName: johndoe-sa
       params:

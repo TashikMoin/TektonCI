@@ -1,3 +1,12 @@
+def url = "ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git"
+def image = "tashikmoin/johndoe-java-microservice"
+def dockerfile = "/workspace/source/"
+def context = "./"
+def imageBuilder = "gcr.io/kaniko-project/executor:v1.5.1"
+def pipelineName = "johndoe"
+def environmentName = "dev"
+def serviceName = "johndoe"
+
 pipeline {
   agent {
     kubernetes {
@@ -16,14 +25,15 @@ pipeline {
                   -H 'Connection: close' \
                   -d '{
                     "build": "'"$BUILD_NUMBER"'",
-                    "url": "ssh://git@github.com/JohndoeWorkflow/Johndoe_Java_Microservice.git",
-                    "image": "tashikmoin/johndoe-java-microservice",
+                    "url": "'"$url"'",
+                    "image": "'"$image"'",
                     "revision": "'"$BUILD_NUMBER"'",
-                    "dockerfile": "/workspace/source/",
-                    "context": "./",
-                    "imageBuilder": "gcr.io/kaniko-project/executor:v1.5.1",
-                    "pipelineName": "johndoe",
-                    "environment": "dev"
+                    "dockerfile": "'"$dockerfile"'",
+                    "context": "'"$context"'",
+                    "imageBuilder": "'"$imageBuilder"'",
+                    "pipelineName": "'"$pipelineName"'",
+                    "environment": "'"$environmentName"'", 
+                    "serviceName": "'"$serviceName"'"
                   }' \
                   http://el-johndoe-event-listener.default.svc.cluster.local:80
               '''
@@ -37,18 +47,14 @@ pipeline {
           container('kubectl') {
             script {
               sleep 30
-              def podNamesOutput = sh(
-                  script: "kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=johndoe-pipelinerun-${BUILD_NUMBER} -n default",
+              def unstructuredPodNames = sh(
+                  script: "kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                   returnStdout: true
               ).trim()
-              def podNames = podNamesOutput.tokenize()
-              echo "Found pods: ${podNames}"
-              echo "${podNames.size()}"
+              def podNames = unstructuredPodNames.tokenize()
               for (int i = 1; i < podNames.size(); i++) {
                   def podName = podNames[i]
                   sh """
-                  echo "Inside loop"
-                  echo "${podName}"
                   kubectl logs -n default -f ${podName}  --all-containers
                   """
               }
