@@ -105,12 +105,12 @@ spec:
         echo "after cd";
         ls -a;
         echo "before sed";
-        cat ArgoCD/Manifest/deployment.yaml;
+        cat deployment.yaml;
         echo "after sed";
-        cat ArgoCD/Manifest/deployment.yaml;
+        cat deployment.yaml;
         git add .;
         echo "after git add .";
         git commit "updated image tag from TektonCI";
         echo "after commit";
         git push -u origin main;
-        cat ArgoCD/Manifest/deployment.yaml;
+        cat deployment.yaml;
