@@ -19,7 +19,7 @@ pipeline {
         steps {
           container('curl') {
             script {
-              sh '''
+              sh """
                  curl -v \
                   -H 'Content-Type: application/json' \
                   -H 'Connection: close' \
@@ -33,10 +33,10 @@ pipeline {
                     "imageBuilder": "'"$imageBuilder"'",
                     "pipelineName": "'"$pipelineName"'",
                     "environment": "'"$environmentName"'", 
-                    "serviceName": "'"johndoe"'"
+                    "serviceName": "'"$serviceName"'"
                   }' \
                   http://el-johndoe-event-listener.default.svc.cluster.local:80
-              '''
+              """
             }
           }
         } 
