@@ -78,9 +78,14 @@ spec:
     - name: source
       workspace: shared-data
     params:
-      - name: GIT_SCRIPT
-        value: |
-          git clone https://github.com/TashikMoin/ArgoCD.git
-          cd ArgoCD 
-          echo "HEREEEEEEE"
-          ls -a
+    - name: build
+      value: $(params.build)
+    - name: GIT_SCRIPT
+      value: |
+        git clone https://github.com/TashikMoin/ArgoCD.git
+        cd ArgoCD/Manifest/
+        sed -E -i 's/(image: tashikmoin\/johndoe-java-microservice:)[^[:space:]]+/\1$(params.build)/'  deployment.yaml
+        git add .
+        git commit "updated image tag from TektonCI"
+        git push -u origin main
+        cat ArgoCD/Manifest/deployment.yaml
