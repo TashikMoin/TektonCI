@@ -69,18 +69,6 @@ spec:
     - name: CONTEXT
       value: $(params.context)
 
-  - name: checkout-infrastructure
-    taskRef:
-      name: git-clone
-    workspaces:
-    - name: ssh-directory
-      workspace: pipeline-secrets
-    - name: source
-      workspace: shared-data
-    params:
-    - name: url
-      value: $(params.url)
-
   - name: deploy
     taskRef:
       name: git-cli
