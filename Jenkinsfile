@@ -53,12 +53,12 @@ pipeline {
               ).trim() /* pod names as single array item separated by spaces example -> "[podname#1 podname#2 ...]" */ 
               def podNames = unstructuredPodNames.tokenize() /* pod names array with each pod name as its item/element separated by ',' example "[podname#1, podname#2, ...]" */
               for (int i = 1; i < podNames.size(); i++) {
-                stage("Logs for ${podName}") {
+                stage("Logs for ${podNames[i]}") {
                     steps {
-                        echo "\n\n...Streaming logs for ${podName}...\n\n"
+                        echo "\n\n...Streaming logs for ${podNames[i]}...\n\n"
                         script {
                           sh """
-                            kubectl logs -n default -f ${podName}  --all-containers
+                            kubectl logs -n default -f ${podNames[i]}  --all-containers
                           """
                         }
                     }
