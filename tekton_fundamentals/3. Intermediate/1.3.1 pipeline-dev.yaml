@@ -53,9 +53,6 @@ spec:
   - name: deploy
     taskRef:
       name: git-cli
-    runAfter:
-      - checkout 
-      - build-and-push-to-docker-registry
     workspaces:
     - name: ssh-directory
       workspace: pipeline-secrets
@@ -76,7 +73,7 @@ spec:
         git add .;
         git commit -m "updated image tag from TektonCI";
         git push;
-        
+
   - name: checkout
     taskRef:
       name: git-clone
