@@ -46,7 +46,7 @@ pipeline {
         steps {
           container('kubectl') {
             script {
-              // sleep 30
+              sleep 30
               def unstructuredPodNames = sh( 
                   script: "kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                   returnStdout: true
