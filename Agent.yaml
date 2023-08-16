@@ -12,7 +12,7 @@ spec:
         - /bin/cat
       tty: true
     - name: curl
-      image: praqma/network-multitool
+      image: tashikmoin/curlandkubectl:latest
       tty: true
       stdin: true
       stdout: true
