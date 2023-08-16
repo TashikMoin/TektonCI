@@ -47,7 +47,14 @@ pipeline {
                   script: "kubectl get pipelineruns -o=jsonpath=‘{.items[*].metadata.name}’ -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                   returnStdout: true
               ).trim()
-              echo "${pipelineRun}"
+            }
+          }
+
+          container('curl') {
+            script {
+              sh """
+                curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}
+              """
             }
           }
         } 
