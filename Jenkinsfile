@@ -35,8 +35,15 @@ pipeline {
                   "environment": "'"$environmentName"'", 
                   "serviceName": "'"$serviceName"'"
                 }' \
-                http://el-johndoe-event-listener.default.svc.cluster.local:80
+                http://el-johndoe-event-listener.default.svc.cluster.local:80;
+
+                def pipelineRun = sh( 
+                    script: "kubectl get pipelineruns -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
+                    returnStdout: true
+                ).trim()
+                echo ${pipelineRun}
                 
+
               """
             }
           }
