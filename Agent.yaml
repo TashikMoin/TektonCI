@@ -12,7 +12,9 @@ spec:
         - /bin/cat
       tty: true
     - name: curl
-      image: tashikmoin/curlandkubectl:latest
+      image: tashikmoin/curlandkubectl
+      command:
+        - /bin/cat
       tty: true
       stdin: true
       stdout: true
