@@ -6,6 +6,7 @@ def imageBuilder = "gcr.io/kaniko-project/executor:v1.5.1"
 def pipelineName = "johndoe"
 def environmentName = "dev"
 def serviceName = "johndoe"
+def pipelineRun = ""
 
 pipeline {
   agent {
@@ -46,7 +47,7 @@ pipeline {
         steps {
           container('kubectl') {
             script {
-              def pipelineRun = sh(
+              pipelineRun = sh(
                   script: "kubectl get pipelineruns -o=jsonpath=‘{.items[*].metadata.name}’ -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                   returnStdout: true
               ).trim()
