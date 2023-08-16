@@ -20,22 +20,30 @@ pipeline {
           container('curl') {
             script {
               sh """
-                 curl -v \
-                  -H 'Content-Type: application/json' \
-                  -H 'Connection: close' \
-                  -d '{
-                    "build": "'"$BUILD_NUMBER"'",
-                    "url": "'"$url"'",
-                    "image": "'"$image"'",
-                    "revision": "'"$BUILD_NUMBER"'",
-                    "dockerfile": "'"$dockerfile"'",
-                    "context": "'"$context"'",
-                    "imageBuilder": "'"$imageBuilder"'",
-                    "pipelineName": "'"$pipelineName"'",
-                    "environment": "'"$environmentName"'", 
-                    "serviceName": "'"$serviceName"'"
-                  }' \
-                  http://el-johndoe-event-listener.default.svc.cluster.local:80
+                curl -v \
+                -H 'Content-Type: application/json' \
+                -H 'Connection: close' \
+                -d '{
+                  "build": "'"$BUILD_NUMBER"'",
+                  "url": "'"$url"'",
+                  "image": "'"$image"'",
+                  "revision": "'"$BUILD_NUMBER"'",
+                  "dockerfile": "'"$dockerfile"'",
+                  "context": "'"$context"'",
+                  "imageBuilder": "'"$imageBuilder"'",
+                  "pipelineName": "'"$pipelineName"'",
+                  "environment": "'"$environmentName"'", 
+                  "serviceName": "'"$serviceName"'"
+                }' \
+                http://el-johndoe-event-listener.default.svc.cluster.local:80
+
+                def pipelineRun = sh( 
+                    script: "kubectl get pipelineruns -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
+                    returnStdout: true
+                ).trim()
+                echo ${pipelineRun}
+                curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}
+                
               """
             }
           }
