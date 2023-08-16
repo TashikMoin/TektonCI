@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: kubectl
+  name: agent
   namespace: jenkins
 spec:
   serviceAccountName: jenkins
@@ -12,9 +12,7 @@ spec:
         - /bin/cat
       tty: true
     - name: curl
-      image: tashikmoin/curlandkubectl
-      command:
-        - tail -f /dev/null
+      image: praqma/network-multitool
       tty: true
       stdin: true
       stdout: true

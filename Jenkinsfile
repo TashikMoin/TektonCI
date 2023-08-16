@@ -35,15 +35,7 @@ pipeline {
                   "environment": "'"$environmentName"'", 
                   "serviceName": "'"$serviceName"'"
                 }' \
-                http://el-johndoe-event-listener.default.svc.cluster.local:80;
-              """
-              def pipelineRun = sh( 
-                  script: "kubectl get pipelineruns -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
-                  returnStdout: true
-              ).trim()
-              sh """
-                echo ${pipelineRun}
-                curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}
+                http://el-johndoe-event-listener.default.svc.cluster.local:80
               """
             }
           }
@@ -54,7 +46,11 @@ pipeline {
         steps {
           container('kubectl') {
             script {
-              sleep 60
+              def pipelineRun = sh(
+                  script: “kubectl get pipelineruns -o=jsonpath=‘{.items[*].metadata.name}’ -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default”,
+                  returnStdout: true
+              ).trim()
+              echo ${pipelineRun}
               def unstructuredPodNames = sh( 
                   script: "kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                   returnStdout: true
