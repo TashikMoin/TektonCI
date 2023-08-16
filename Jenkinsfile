@@ -39,7 +39,7 @@ pipeline {
               http://el-johndoe-event-listener.default.svc.cluster.local:80
             """
             pipelineRun = sh(
-                script: "kubectl get pipelineruns -o=jsonpath=‘{.items[*].metadata.name}’ -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
+                script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                 returnStdout: true
             ).trim()
             sh """
