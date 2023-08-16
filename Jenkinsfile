@@ -43,7 +43,6 @@ pipeline {
                 returnStdout: true
             ).trim()
             sh """
-              sleep 30
               curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}
             """
           }
