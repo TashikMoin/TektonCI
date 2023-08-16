@@ -14,7 +14,7 @@ spec:
     - name: curl
       image: tashikmoin/curlandkubectl
       command:
-        - /bin/cat
+        - tail -f /dev/null
       tty: true
       stdin: true
       stdout: true
