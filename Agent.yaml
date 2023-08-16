@@ -1,18 +1,12 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: agent-kubectl-curl
+  name: builder
   namespace: jenkins
 spec:
   serviceAccountName: jenkins
   containers:
-    - name: kubectl
-      image: yonadev/jnlp-slave-k8s-helm
-      command:
-        - /bin/cat
-      tty: true
-    - name: curl
-      image: praqma/network-multitool
+    - name: enabler
+      image: tashikmoin/tools
       tty: true
       stdin: true
-      stdout: true

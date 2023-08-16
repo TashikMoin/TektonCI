@@ -14,50 +14,41 @@ pipeline {
       yamlFile 'Agent.yaml'
     }
   }
-    stages {
-      stage('Invoke tekton pipeline using curl') {   
+  stages {
+    stage('Invoke tekton pipeline using curl') {   
 
-        steps {
-          container('curl') {
-            script {
-              sh """
-                curl -v \
-                -H 'Content-Type: application/json' \
-                -H 'Connection: close' \
-                -d '{
-                  "build": "'"$BUILD_NUMBER"'",
-                  "url": "'"$url"'",
-                  "image": "'"$image"'",
-                  "revision": "'"$BUILD_NUMBER"'",
-                  "dockerfile": "'"$dockerfile"'",
-                  "context": "'"$context"'",
-                  "imageBuilder": "'"$imageBuilder"'",
-                  "pipelineName": "'"$pipelineName"'",
-                  "environment": "'"$environmentName"'", 
-                  "serviceName": "'"$serviceName"'"
-                }' \
-                http://el-johndoe-event-listener.default.svc.cluster.local:80
-              """
-            }
+      steps {
+        container('enabler') {
+          script {
+            sh """
+              curl -v \
+              -H 'Content-Type: application/json' \
+              -H 'Connection: close' \
+              -d '{
+                "build": "'"$BUILD_NUMBER"'",
+                "url": "'"$url"'",
+                "image": "'"$image"'",
+                "revision": "'"$BUILD_NUMBER"'",
+                "dockerfile": "'"$dockerfile"'",
+                "context": "'"$context"'",
+                "imageBuilder": "'"$imageBuilder"'",
+                "pipelineName": "'"$pipelineName"'",
+                "environment": "'"$environmentName"'", 
+                "serviceName": "'"$serviceName"'"
+              }' \
+              http://el-johndoe-event-listener.default.svc.cluster.local:80
+            """
+            pipelineRun = sh(
+                script: "kubectl get pipelineruns -o=jsonpath=‘{.items[*].metadata.name}’ -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
+                returnStdout: true
+            ).trim()
+            sh """
+              sleep 10
+              curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}
+            """
           }
-
-          container('kubectl') {
-            script {
-              pipelineRun = sh(
-                  script: "kubectl get pipelineruns -o=jsonpath=‘{.items[*].metadata.name}’ -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
-                  returnStdout: true
-              ).trim()
-            }
-          }
-
-          container('curl') {
-            script {
-              sh """
-                curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}
-              """
-            }
-          }
-        } 
-      }
+        }
+      } 
     }
+  }
 }
