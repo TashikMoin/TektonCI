@@ -50,6 +50,7 @@ pipeline {
                   script: "kubectl get pipelineruns -o=jsonpath=‘{.items[*].metadata.name}’ -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                   returnStdout: true
               ).trim()
+              echo ${pipelineRun}
               def unstructuredPodNames = sh( 
                   script: "kubectl get pods -o=jsonpath='{.items[*].metadata.name}' -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                   returnStdout: true
