@@ -51,9 +51,9 @@ pipeline {
                 script: "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}"
             ).trim()
             def data = readJSON(text: jsonResponse)
-            def taskNames = data.status.pipelineSpec.tasks.collect { item.name }
-            def pods = taskNames.collect { "${pipelineRun}-${item}-pod" }
-            echo "Prefixed Task Names: ${pods}"
+            def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
+            def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
+            echo "${pods}"
           }
         }
       } 
