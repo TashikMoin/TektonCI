@@ -43,7 +43,7 @@ pipeline {
                 returnStdout: true
             ).trim()
             def JSON_RESPONSE = {}
-            sh "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}"
+            sh "${JSON_RESPONSE} = curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}"
             def data = readJSON(text: "${JSON_RESPONSE}")
             echo "${data}"
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
