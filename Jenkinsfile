@@ -63,14 +63,14 @@ pipeline {
                 while(true) {
                   def curlCommand = "curl -s http://20.54.100.130/api/v1/namespaces/${pipelineRunNamespace}/pods/${pod}/log?container=${containerName}&follow=true"
                   def logsResponse = sh(script: curlCommand, returnStdout: true).trim()
-                  def logsJson = new groovy.json.JsonSlurperClassic().parseText(logsResponse)
+                  def logsJson = readJSON(text: logsResponse)
                   if (logsJson.reason == "BadRequest"){
                     continue;
                   }
                   break;
                 }
-                  echo "Logs for pod ${pod}, container ${containerName}:"
-                  echo "${logsJson}"
+                echo "Logs for pod ${pod}, container ${containerName}:"
+                echo "${logsJson}"
               }
             }
           }
