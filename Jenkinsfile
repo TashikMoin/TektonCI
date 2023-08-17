@@ -62,7 +62,7 @@ pipeline {
               for (containerName in containerNames) {
                 def curlCommand = "curl -s http://20.54.100.130/api/v1/namespaces/${pipelineRunNamespace}/pods/${podName}/log?container=${containerName}&follow=true"
                 def logs = sh(script: curlCommand, returnStdout: true).trim()
-                echo "Logs for pod ${podName}, container ${containerName}:"
+                echo "Logs for pod ${pod}, container ${containerName}:"
                 echo logs
               }
             }
