@@ -20,7 +20,7 @@ pipeline {
       steps {
         container('enabler') {
           script {
-            def event = sh(
+            def event = readJSON text sh(
                 returnStdout: true,
                 script: """
                   curl -v \\
@@ -41,9 +41,8 @@ pipeline {
                   http://el-johndoe-event-listener.default.svc.cluster.local:80
                 """
             ).trim()
-            echo "${event}"
-            pipelineRun = sh(
-                script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l triggers.tekton.dev/triggers-eventid=${event["eventID"]} -A",
+            def pipelineRun = sh (
+                script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l triggers.tekton.dev/triggers-eventid=${event.eventID} -A",
                 returnStdout: true
             ).trim()
             def json_response = sh(
