@@ -58,13 +58,9 @@ pipeline {
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
             echo "${pods}"
             for (pod in pods) {
-              def podNamespace = sh(
-                script: "kubectl get pod ${pod} -o=jsonpath={.items[*].metadata.namespace}",
-                returnStdout: true
-              ).trim()
-              def containerNames = sh(script: "kubectl get pods ${pod} -n ${podNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
+              def containerNames = sh(script: "kubectl get pods ${pod} -n ${pipelineRunNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
               for (containerName in containerNames) {
-                def curlCommand = "curl -s http://20.54.100.130/api/v1/namespaces/${podNamespace}/pods/${podName}/log?container=${containerName}&follow=true"
+                def curlCommand = "curl -s http://20.54.100.130/api/v1/namespaces/${pipelineRunNamespace}/pods/${podName}/log?container=${containerName}&follow=true"
                 def logs = sh(script: curlCommand, returnStdout: true).trim()
                 echo "Logs for pod ${podName}, container ${containerName}:"
                 echo logs
