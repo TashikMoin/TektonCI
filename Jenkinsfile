@@ -43,7 +43,7 @@ pipeline {
             ).trim()
             echo "${event}"
             pipelineRun = sh(
-                script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l triggers.tekton.dev/triggers-eventid=${event.eventID} -A",
+                script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l triggers.tekton.dev/triggers-eventid=${event["eventID"]} -A",
                 returnStdout: true
             ).trim()
             def json_response = sh(
