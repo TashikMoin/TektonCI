@@ -42,7 +42,8 @@ pipeline {
                 script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                 returnStdout: true
             ).trim()
-            def JSON_RESPONSE = curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}
+            def JSON_RESPONSE = {}
+            sh "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}"
             def data = readJSON(text: "${JSON_RESPONSE}")
             echo "${data}"
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
