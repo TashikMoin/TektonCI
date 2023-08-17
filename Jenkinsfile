@@ -65,7 +65,6 @@ pipeline {
 
               def containerNames = sh(script: "kubectl get pods ${pod} -n ${podNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
               for (containerName in containerNames) {
-                /api/v1/namespaces/default/pods/johndoe-pipelinerun-rjw9v-build-and-push-to-docker-registry-pod/log?container=step-build-and-push&follow=true
                   def curlCommand = "curl -s http://20.54.100.130/api/v1/namespaces/${podNamespace}/pods/${podName}/log?container=${containerName}&follow=true"
                   def logs = sh(script: curlCommand, returnStdout: true).trim()
                   echo "Logs for pod ${podName}, container ${containerName}:"
