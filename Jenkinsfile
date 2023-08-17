@@ -59,7 +59,7 @@ pipeline {
             echo "${pods}"
             for (pod in pods) {
               def podNamespace = sh(
-                script: "kubectl get pod ${pod} -o=jsonpath={.items[*].metadata.namespace} -A",
+                script: "kubectl get pod ${pod} -o=jsonpath={.items[*].metadata.namespace}",
                 returnStdout: true
               ).trim()
               def containerNames = sh(script: "kubectl get pods ${pod} -n ${podNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
