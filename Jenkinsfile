@@ -20,38 +20,40 @@ pipeline {
       steps {
         container('enabler') {
           script {
-            sh """
-              curl -v \
-              -H 'Content-Type: application/json' \
-              -H 'Connection: close' \
-              -d '{
-                "build": "'"$BUILD_NUMBER"'",
-                "url": "'"$url"'",
-                "image": "'"$image"'",
-                "revision": "'"$BUILD_NUMBER"'",
-                "dockerfile": "'"$dockerfile"'",
-                "context": "'"$context"'",
-                "imageBuilder": "'"$imageBuilder"'",
-                "pipelineName": "'"$pipelineName"'",
-                "environment": "'"$environmentName"'", 
-                "serviceName": "'"$serviceName"'"
-              }' \
-              http://el-johndoe-event-listener.default.svc.cluster.local:80
-            """
+            def event = sh(
+                returnStdout: true,
+                script: """
+                  curl -v \\
+                  -H 'Content-Type: application/json' \\
+                  -H 'Connection: close' \\
+                  -d '{
+                    "build": "'"$BUILD_NUMBER"'",
+                    "url": "'"$url"'",
+                    "image": "'"$image"'",
+                    "revision": "'"$BUILD_NUMBER"'",
+                    "dockerfile": "'"$dockerfile"'",
+                    "context": "'"$context"'",
+                    "imageBuilder": "'"$imageBuilder"'",
+                    "pipelineName": "'"$pipelineName"'",
+                    "environment": "'"$environmentName"'", 
+                    "serviceName": "'"$serviceName"'"
+                  }' \\
+                  http://el-johndoe-event-listener.default.svc.cluster.local:80
+                """
+            ).trim()
+            echo ${event}
             pipelineRun = sh(
                 script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l pipelineRunName=${serviceName}-${BUILD_NUMBER} -n default",
                 returnStdout: true
             ).trim()
-            def JSON_RESPONSE = sh(
+            def json_response = sh(
                 returnStdout: true,
                 script: "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}"
             ).trim()
-            def data = readJSON(text: JSON_RESPONSE)
-            echo "${data}"
+            def data = readJSON(text: json_response)
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
-            echo "${taskNames}"
-            def prefixedTaskNames = taskNames.collect { "${pipelineRun}-${it}" }
-            echo "Prefixed Task Names: ${prefixedTaskNames.join(', ')}"
+            def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
+            echo "Prefixed Task Names: ${pods}"
           }
         }
       } 
