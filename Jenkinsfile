@@ -60,10 +60,18 @@ pipeline {
             for (pod in pods) {
               def containerNames = sh(script: "kubectl get pods ${pod} -n ${pipelineRunNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
               for (containerName in containerNames) {
-                def curlCommand = "curl -s http://20.54.100.130/api/v1/namespaces/${pipelineRunNamespace}/pods/${pod}/log?container=${containerName}&follow=true"
-                def logs = sh(script: curlCommand, returnStdout: true).trim()
-                echo "Logs for pod ${pod}, container ${containerName}:"
-                echo logs
+                while(true) {
+                  def curlCommand = "curl -s http://20.54.100.130/api/v1/namespaces/${pipelineRunNamespace}/pods/${pod}/log?container=${containerName}&follow=true"
+                  def logs = sh(script: curlCommand, returnStdout: true).trim()
+                  if (logs.reason == "BadRequest"){
+                    continue;
+                  }
+                  else{
+                    break;
+                  }
+                }
+                  echo "Logs for pod ${pod}, container ${containerName}:"
+                  echo logs
               }
             }
           }
