@@ -58,6 +58,14 @@ pipeline {
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
             echo "${pods}"
+            def response = httpRequest(
+                url: "ws://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelines/?fieldSelector=metadata.name%3Djohndoe-dev&watch=true&resourceVersion=4366145",
+                contentType: 'AUTO',
+                httpMode: 'GET'
+            )
+            
+            // Process the response as needed
+            echo "Response: ${response}"
           }
         }
       } 
