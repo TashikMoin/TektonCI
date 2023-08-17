@@ -48,11 +48,13 @@ pipeline {
                 script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l triggers.tekton.dev/triggers-eventid=${eventID} -A",
                 returnStdout: true
             ).trim())
-            def json_response = sh(
+            def jsonResponse = sh(
                 returnStdout: true,
                 script: "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}"
             ).trim()
-            def data = readJSON(text: json_response)
+            echo "json response"
+            echo "${jsonResponse}"
+            def data = readJSON(text: jsonResponse)
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
             echo "Prefixed Task Names: ${pods}"
