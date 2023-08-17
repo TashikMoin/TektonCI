@@ -43,11 +43,12 @@ pipeline {
             ).trim()
             def eventJson = readJSON(text: event)
             def eventID = eventJson.eventID
-            echo "${eventID}"
             pipelineRun = readJSON(text: sh(
                 script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l triggers.tekton.dev/triggers-eventid=${eventID} -A",
                 returnStdout: true
             ).trim())
+            echo "pipelineRun name"
+            echo "${pipelineRun}"
             def jsonResponse = sh(
                 returnStdout: true,
                 script: "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}"
