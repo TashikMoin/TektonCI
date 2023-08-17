@@ -15,7 +15,6 @@ pipeline {
   }
   stages {
     stage('Invoke tekton pipeline using curl') {   
-
       steps {
         container('enabler') {
           script {
@@ -58,12 +57,21 @@ pipeline {
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
             echo "${pods}"
-            def wsUrl = "ws://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelines/?fieldSelector=metadata.name%3Djohndoe-dev&watch=true&resourceVersion=4366145"
-            sh "curl -L https://github.com/vi/websocat/releases/latest/download/websocat_amd64-linux -o websocat"
-            sh "chmod +x websocat"
-            
-            // Run websocat to establish WebSocket connection
-            sh "./websocat ${wsUrl}"
+            for (pod in pods) {
+              def podNamespace = sh(
+                  script: "kubectl get pod ${pod} -o=jsonpath={.items[*].metadata.namespace} -A",
+                  returnStdout: true
+              ).trim()
+
+              def containerNames = sh(script: "kubectl get pods ${pod} -n ${podNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
+              for (containerName in containerNames) {
+                /api/v1/namespaces/default/pods/johndoe-pipelinerun-rjw9v-build-and-push-to-docker-registry-pod/log?container=step-build-and-push&follow=true
+                  def curlCommand = "curl -s http://20.54.100.130/api/v1/namespaces/${podNamespace}/pods/${podName}/log?container=${containerName}&follow=true"
+                  def logs = sh(script: curlCommand, returnStdout: true).trim()
+                  echo "Logs for pod ${podName}, container ${containerName}:"
+                  echo logs
+              }
+            }
           }
         }
       } 
