@@ -6,7 +6,6 @@ def imageBuilder = "gcr.io/kaniko-project/executor:v1.5.1"
 def pipelineName = "johndoe"
 def environmentName = "dev"
 def serviceName = "johndoe"
-def pipelineRun = ""
 
 pipeline {
   agent {
@@ -43,10 +42,10 @@ pipeline {
             ).trim()
             def eventJson = readJSON(text: event)
             def eventID = eventJson.eventID
-            def pipelineRun = readJSON(text: sh(
+            def pipelineRun = sh(
                 script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l triggers.tekton.dev/triggers-eventid=${eventID} -A",
                 returnStdout: true
-            ).trim())
+            ).trim()
             def jsonResponse = sh(
                 returnStdout: true,
                 script: "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/default/pipelineruns/${pipelineRun}"
