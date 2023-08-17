@@ -41,9 +41,11 @@ pipeline {
                   http://el-johndoe-event-listener.default.svc.cluster.local:80
                 """
             ).trim()
-            echo "${event}"
+            def eventJson = readJSON(text: event)
+            def eventID = eventJson.eventID
+            echo "${eventID}"
             pipelineRun = readJSON(text: sh(
-                script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l triggers.tekton.dev/triggers-eventid=${event.eventID} -A",
+                script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.name} -l triggers.tekton.dev/triggers-eventid=${eventID} -A",
                 returnStdout: true
             ).trim())
             def json_response = sh(
