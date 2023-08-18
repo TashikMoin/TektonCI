@@ -68,8 +68,7 @@ pipeline {
                   returnStdout: true,
                   script: "kubectl get pod ${pod} -o=jsonpath='{.status.phase}' -n ${pipelineRunNamespace}"
                   ).trim()
-                  echo "${isPodRunning}"
-                  if(isPodRunning){
+                  if(isPodRunning=="Running"){
                     sh """
                       kubectl logs pod/${pod} -c ${containerName} -n ${pipelineRunNamespace}
                     """
