@@ -59,32 +59,9 @@ pipeline {
             def data = readJSON(text: jsonResponse)
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
-            echo "${pods}"
-            for (pod in pods) {
-              def containerNames = sh(script: "kubectl get pods ${pod} -n ${pipelineRunNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
-              for (containerName in containerNames) {
-                while(true){
-                  def isPodRunning = ""
-                  def isPodExist = sh(
-                  returnStdout: true,
-                  script: "kubectl get pod ${pod} -n ${pipelineRunNamespace}"
-                  ).trim()
-                  if(isPodExist.startsWith("${pod}"))
-                    isPodRunning = sh(
-                    returnStdout: true,
-                    script: "kubectl get pod ${pod} -o=jsonpath='{.status.phase}' -n ${pipelineRunNamespace}"
-                    ).trim()
-                  if(isPodRunning=="Running"){
-                    sh """
-                      kubectl logs pod/${pod} -c ${containerName} -n ${pipelineRunNamespace}
-                    """
-                    break;
-                  }
-                  else{
-                    continue;
-                  }
-                }
-              }
+            sleep(15)
+            for(i=0; i<pod.size(); i++){
+              kubectl logs -f "${pods[i]}" -n "${pipelineRunNamespace}"
             }
           }
         }
