@@ -63,9 +63,21 @@ pipeline {
             for (pod in pods) {
               def containerNames = sh(script: "kubectl get pods ${pod} -n ${pipelineRunNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
               for (containerName in containerNames) {
-                sh """
-                  kubectl logs pod/${pod} -c ${containerName} -n ${pipelineRunNamespace} 
-                """
+                while(true){
+                  def isPodRunning = sh(
+                  returnStdout: true,
+                  script: "kubectl get pod ${pod} -o=jsonpath='{.status.phase}'"
+                  ).trim()
+                  if(isPodRunning){
+                    sh """
+                      kubectl logs pod/${pod} -c ${containerName} -n ${pipelineRunNamespace}
+                    """
+                    break;
+                  }
+                  else{
+                    continue;
+                  }
+                }
               }
             }
           }
