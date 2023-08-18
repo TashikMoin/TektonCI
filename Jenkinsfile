@@ -66,7 +66,7 @@ pipeline {
                 while(true){
                   def isPodRunning = sh(
                   returnStdout: true,
-                  script: "kubectl get pod ${pod} -o=jsonpath='{.status.phase}'"
+                  script: "kubectl get pod ${pod} -o=jsonpath='{.status.phase}' -n ${pipelineRunNamespace}"
                   ).trim()
                   if(isPodRunning){
                     sh """
