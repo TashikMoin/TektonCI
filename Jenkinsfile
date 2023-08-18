@@ -13,6 +13,9 @@ pipeline {
       yamlFile 'Agent.yaml'
     }
   }
+  environment {
+      gitVersion = sh(returnStdout: true, script: 'git describe --always --tags').trim()
+  }
   stages {
     stage('Invoke tekton pipeline using curl') {   
       steps {
@@ -60,17 +63,9 @@ pipeline {
             for (pod in pods) {
               def containerNames = sh(script: "kubectl get pods ${pod} -n ${pipelineRunNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
               for (containerName in containerNames) {
-                while(true) {
-                  def curlCommand = "curl -s http://20.54.100.130/api/v1/namespaces/${pipelineRunNamespace}/pods/${pod}/log?container=${containerName}&follow=true"
-                  def logsResponse = sh(script: curlCommand, returnStdout: true).trim()
-                  def logsJson = readJSON(text: logsResponse)
-                  if (logsJson.reason == "BadRequest"){
-                    continue;
-                  }
-                  break;
-                }
-                echo "Logs for pod ${pod}, container ${containerName}:"
-                echo "${logsJson}"
+                sh """
+                  kubectl logs pod/${pod} -c ${containerName} -n ${pipelineRunNamespace} 
+                """
               }
             }
           }
