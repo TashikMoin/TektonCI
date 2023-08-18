@@ -64,12 +64,13 @@ pipeline {
               def containerNames = sh(script: "kubectl get pods ${pod} -n ${pipelineRunNamespace} -o jsonpath='{.spec.containers[*].name}'", returnStdout: true).trim().split(" ")
               for (containerName in containerNames) {
                 while(true){
+                  def isPodRunning = ""
                   def isPodExist = sh(
                   returnStdout: true,
                   script: "kubectl get pod ${pod} -n ${pipelineRunNamespace}"
                   ).trim()
                   if(isPodExist.startsWith("${pod}"))
-                    def isPodRunning = sh(
+                    isPodRunning = sh(
                     returnStdout: true,
                     script: "kubectl get pod ${pod} -o=jsonpath='{.status.phase}' -n ${pipelineRunNamespace}"
                     ).trim()
