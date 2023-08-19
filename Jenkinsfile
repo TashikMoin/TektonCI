@@ -59,7 +59,7 @@ pipeline {
             def data = readJSON(text: jsonResponse)
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
-            for(i=0; i<pod.size(); i++){
+            for(i=0; i<pods.size(); i++){
               def podName = pods[i]
               def logsAvailable = false
               while(true){
