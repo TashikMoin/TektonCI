@@ -63,21 +63,18 @@ pipeline {
               def podName = pods[i]
               def logsAvailable = false
               while(true){
-                echo "before"
                 def podStatus = sh(
                     returnStdout: true,
                     script: "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                 ).trim()
-                echo "after"
-                echo "Value of pod status is ${podStatus}"
                 if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
                     logsAvailable = true
                     break
                 }
                 echo "Inside while(true)"
-                sleep(5)
+                sleep(3)
               }
-              sh 'kubectl logs -f "${pods[i]}" -n "${pipelineRunNamespace}"'
+              sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace}"
             }
           }
         }
