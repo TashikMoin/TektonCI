@@ -65,9 +65,9 @@ pipeline {
               while(true){
                 echo "before"
                 def podStatus = sh(
-                    returnStatus: true,
+                    returnStdout: true,
                     script: "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
-                )
+                ).trim()
                 echo "after"
                 echo "Value of pod status is ${podStatus}"
                 if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
