@@ -67,10 +67,12 @@ pipeline {
                     returnStatus: true,
                     script: "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                 ).trim()
+                echo "Value of pod status is ${podStatus}"
                 if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
                     logsAvailable = true
                     break
                 }
+                echo "Inside while(true)"
                 sleep(5)
               }
               sh 'kubectl logs -f "${pods[i]}" -n "${pipelineRunNamespace}"'
