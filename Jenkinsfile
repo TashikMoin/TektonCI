@@ -59,9 +59,21 @@ pipeline {
             def data = readJSON(text: jsonResponse)
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
-            sleep(15)
             for(i=0; i<pod.size(); i++){
-              kubectl logs -f "${pods[i]}" -n "${pipelineRunNamespace}"
+              def podName = pods[i]
+              def logsAvailable = false
+              while(true){
+                def podStatus = sh(
+                    returnStatus: true,
+                    script: "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
+                ).trim()
+                if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
+                    logsAvailable = true
+                    break
+                }
+                sleep(5)
+              }
+              sh 'kubectl logs -f "${pods[i]}" -n "${pipelineRunNamespace}"'
             }
           }
         }
