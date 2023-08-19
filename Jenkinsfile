@@ -63,6 +63,8 @@ pipeline {
               def podName = pods[i]
               def logsAvailable = false
               while(true){
+                echo "... Fetching logs ..."
+                sleep(5)
                 def podStatus = sh(
                     returnStdout: true,
                     script: "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
@@ -71,8 +73,6 @@ pipeline {
                     logsAvailable = true
                     break
                 }
-                echo "Inside while(true)"
-                sleep(3)
               }
               sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace}"
             }
