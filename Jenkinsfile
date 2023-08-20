@@ -57,7 +57,8 @@ pipeline {
                 script: "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/${pipelineRunNamespace}/pipelineruns/${pipelineRun}"
             ).trim()
             def data = readJSON(text: jsonResponse)
-            def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
+            def taskNames = data.status.pipelineSpec.tasks.collect { it.name, it.runAfter }
+            echo "${taskNames}"
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
             for(i=0; i<pods.size(); i++){
               def logsAvailable = false
