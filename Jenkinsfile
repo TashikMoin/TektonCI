@@ -49,12 +49,12 @@ pipeline {
                 returnStdout: true
             ).trim()
             def pipelineRunNamespace = sh(
-                script: "#!/bin/sh -e\n" + "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.namespace} -l triggers.tekton.dev/triggers-eventid=${eventID} -A",
+                script: "kubectl get pipelineruns -o=jsonpath={.items[*].metadata.namespace} -l triggers.tekton.dev/triggers-eventid=${eventID} -A",
                 returnStdout: true
             ).trim()
             def jsonResponse = sh(
                 returnStdout: true,
-                script: "#!/bin/sh -e\n"+ "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/${pipelineRunNamespace}/pipelineruns/${pipelineRun}"
+                script: "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/${pipelineRunNamespace}/pipelineruns/${pipelineRun}"
             ).trim()
             def data = readJSON(text: jsonResponse)
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
@@ -72,13 +72,14 @@ pipeline {
                 if (podExists == 0) {
                   podPhase = sh(
                       returnStdout: true,
-                      script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
+                      script: "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                   )
                   if (podPhase == "Running" || podPhase == "Succeeded" || podPhase == "CrashLoopBackOff" || podPhase == "Error") {
                       logsAvailable = true
                       break
                   }
                 }
+                sleep(3)
               }
               sh "Running"
               sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace} --all-containers=true"
