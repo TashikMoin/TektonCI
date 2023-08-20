@@ -57,7 +57,7 @@ pipeline {
                 script: "curl -X GET http://20.54.100.130/apis/tekton.dev/v1/namespaces/${pipelineRunNamespace}/pipelineruns/${pipelineRun}"
             ).trim()
             def data = readJSON(text: jsonResponse)
-            def taskNames = data.status.pipelineSpec.tasks.collect { it.name, it.runAfter }
+            def taskNames = data.status.pipelineSpec.tasks.collect { task -> [name: task.name, runAfter: task.runAfter] }
             echo "${taskNames}"
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
             for(i=0; i<pods.size(); i++){
