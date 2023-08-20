@@ -71,7 +71,7 @@ pipeline {
                       script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                   )
                   if (podPhase == 0) {
-                    def podStatus = sh(
+                    podStatus = sh(
                         returnStdout: true,
                         script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                     )
