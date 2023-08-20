@@ -66,8 +66,7 @@ pipeline {
                 def podPhase = ""
                 def podExists = sh(
                     returnStatus: true,
-                    returnStdout: false,
-                    script: "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
+                    script: "kubectl get pod ${podName} -n ${pipelineRunNamespace}"
                 )
                 if (podExists == 0) {
                   podPhase = sh(
@@ -79,7 +78,6 @@ pipeline {
                       break
                   }
                 }
-                sleep(3)
               }
               echo "Running"
               sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace} --all-containers=true"
