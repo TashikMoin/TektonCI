@@ -61,7 +61,6 @@ pipeline {
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
             script {
               for(i=0; i<pods.size(); i++){
-                sleep(5)
                 def podName = pods[i]
                 def logsAvailable = false
                 while(true){
@@ -70,15 +69,16 @@ pipeline {
                       returnStatus: true,
                       script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                   )
+                  echo "${podPhase}"
                   if (podPhase == 0) {
                     podStatus = sh(
                         returnStdout: true,
                         script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                     )
-                  }
-                  if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
-                      logsAvailable = true
-                      break
+                    if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
+                        logsAvailable = true
+                        break
+                    }
                   }
                 }
                 sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace}"
