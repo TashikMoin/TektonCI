@@ -65,7 +65,7 @@ pipeline {
               while(true){
                 def podStatus = sh(
                     returnStdout: true,
-                    script: "#!/bin/sh -e\n+ kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
+                    script: "#!/bin/sh -e\n"+ "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                 ).trim()
                 if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
                     logsAvailable = true
