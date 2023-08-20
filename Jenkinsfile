@@ -60,18 +60,17 @@ pipeline {
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
             for(i=0; i<pods.size(); i++){
-              def podName = pods[i]
               def logsAvailable = false
               while(true){
                 def podPhase = ""
                 def podExists = sh(
                     returnStatus: true,
-                    script: "kubectl get pod ${podName} -n ${pipelineRunNamespace}"
+                    script: "kubectl get pod ${pods[i]} -n ${pipelineRunNamespace}"
                 )
                 if (podExists == 0) {
                   podPhase = sh(
                       returnStdout: true,
-                      script: "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
+                      script: "kubectl get pod ${pods[i]} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                   )
                   if (podPhase == "Running" || podPhase == "Succeeded" || podPhase == "CrashLoopBackOff" || podPhase == "Error") {
                       logsAvailable = true
