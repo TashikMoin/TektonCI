@@ -67,7 +67,7 @@ pipeline {
                 def podExists = sh(
                     returnStatus: true,
                     returnStdout: false,
-                    script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace}"
+                    script: "kubectl get pod ${podName} -n ${pipelineRunNamespace}"
                 )
                 if (podExists == 0) {
                   podPhase = sh(
