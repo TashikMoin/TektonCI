@@ -81,7 +81,7 @@ pipeline {
                 }
                 sleep(3)
               }
-              sh "Running"
+              echo "Running"
               sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace} --all-containers=true"
             }
           }
