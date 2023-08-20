@@ -80,7 +80,7 @@ pipeline {
                   }
                 }
               }
-              sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace}"
+              sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace} --all-containers=true --previous"
             }
           }
         }
