@@ -72,7 +72,7 @@ pipeline {
                       script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                   )
                   if (podPhase == 0) {
-                      podStatus = podPhase.trim()
+                      podStatus = podPhase.out.text.trim()
                   }
                   if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
                       logsAvailable = true
