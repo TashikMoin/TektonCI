@@ -68,11 +68,13 @@ pipeline {
                   def podStatus = ""
                   def podPhase = sh(
                       returnStatus: true,
-                      returnStdout: true,
                       script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                   )
                   if (podPhase == 0) {
-                      podStatus = podPhase.out.text.trim()
+                    def podStatus = sh(
+                        returnStdout: true,
+                        script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
+                    )
                   }
                   if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
                       logsAvailable = true
