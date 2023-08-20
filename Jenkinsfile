@@ -59,30 +59,27 @@ pipeline {
             def data = readJSON(text: jsonResponse)
             def taskNames = data.status.pipelineSpec.tasks.collect { it.name }
             def pods = taskNames.collect { "${pipelineRun}-${it}-pod" }
-            script {
-              for(i=0; i<pods.size(); i++){
-                def podName = pods[i]
-                def logsAvailable = false
-                while(true){
-                  def podStatus = ""
-                  def podPhase = sh(
-                      returnStatus: true,
+            for(i=0; i<pods.size(); i++){
+              def podName = pods[i]
+              def logsAvailable = false
+              while(true){
+                def podPhase = ""
+                def podExists = sh(
+                    returnStatus: true,
+                    script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace}"
+                )
+                if (podExists == 0) {
+                  podPhase = sh(
+                      returnStdout: true,
                       script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
                   )
-                  echo "${podPhase}"
-                  if (podPhase == 0) {
-                    podStatus = sh(
-                        returnStdout: true,
-                        script: "#!/bin/sh -e\n" + "kubectl get pod ${podName} -n ${pipelineRunNamespace} -o jsonpath='{.status.phase}'"
-                    )
-                    if (podStatus == "Running" || podStatus == "Succeeded" || podStatus == "CrashLoopBackOff" || podStatus == "Error") {
-                        logsAvailable = true
-                        break
-                    }
+                  if (podPhase == "Running" || podPhase == "Succeeded" || podPhase == "CrashLoopBackOff" || podPhase == "Error") {
+                      logsAvailable = true
+                      break
                   }
                 }
-                sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace}"
               }
+              sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace}"
             }
           }
         }
