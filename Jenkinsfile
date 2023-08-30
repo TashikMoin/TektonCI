@@ -78,7 +78,6 @@ pipeline {
                   }
                 }
               }
-              echo "Running"
               sh "kubectl logs -f ${pods[i]} -n ${pipelineRunNamespace} --all-containers=true"
             }
           }
